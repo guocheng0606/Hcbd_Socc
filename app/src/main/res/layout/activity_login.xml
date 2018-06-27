@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/image_login_bg">
+
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="121px"
+        android:layout_height="135px"
+        android:src="@drawable/image_login_logo"
+        android:layout_marginTop="197px"
+        android:layout_centerHorizontal="true"/>
+    <ImageView
+        android:id="@+id/iv_text"
+        android:layout_width="377px"
+        android:layout_height="30px"
+        android:src="@drawable/image_logo_text"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/iv_logo"
+        android:layout_marginTop="40px"/>
+
+    <LinearLayout
+        android:id="@+id/ll_user"
+        android:layout_width="450px"
+        android:layout_height="80px"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/image_login_input_bg"
+        android:layout_below="@+id/iv_text"
+        android:layout_marginTop="156px"
+        android:gravity="center_vertical">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_login_user"
+            android:layout_marginLeft="30px"
+            android:layout_marginRight="30px"/>
+        <EditText
+            android:id="@+id/et_username"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:layout_marginRight="30px"
+            android:hint="@string/input_username"
+            android:textSize="28px"
+            android:textColor="@color/text_color"
+            android:maxLines="1"
+            android:inputType="text"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_password"
+        android:layout_width="450px"
+        android:layout_height="80px"
+        android:orientation="horizontal"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/image_login_input_bg"
+        android:layout_below="@+id/ll_user"
+        android:layout_marginTop="30px"
+        android:gravity="center_vertical">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_login_password"
+            android:layout_marginLeft="30px"
+            android:layout_marginRight="30px"/>
+        <EditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:layout_marginRight="30px"
+            android:hint="@string/input_password"
+            android:textSize="28px"
+            android:textColor="@color/text_color"
+            android:maxLines="1"
+            android:inputType="textPassword"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_login"
+        android:layout_width="474px"
+        android:layout_height="100px"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/ll_password"
+        android:layout_marginTop="80px"
+        android:background="@drawable/image_login_button_bg"
+        android:text="@string/login"
+        android:textColor="@color/black"
+        android:textSize="30px"/>
+
+
+</RelativeLayout>

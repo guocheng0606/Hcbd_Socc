@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_map"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100px"
+        android:background="@color/colorAccent">
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/selector_back_bg"
+            android:paddingLeft="30px"
+            android:paddingRight="20px"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/map"
+            android:textColor="@color/white"
+            android:textSize="36px"
+            android:layout_centerInParent="true"/>
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/selector_more_bg"
+            android:layout_alignParentRight="true"
+            android:paddingRight="30px"
+            android:paddingLeft="15px"/>
+        <ImageView
+            android:id="@+id/iv_refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/iv_more"
+            android:src="@drawable/selector_refresh_bg"
+            android:paddingLeft="15px"
+            android:paddingRight="15px"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="58px"
+        android:orientation="horizontal"
+        android:background="@color/colorAccent"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/tv_connect"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="27px"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:text="连接：0"/>
+        <View
+            android:layout_width="2px"
+            android:layout_height="43px"
+            android:background="@color/white"/>
+        <TextView
+            android:id="@+id/tv_danger"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="27px"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:text="危险：0"/>
+        <View
+            android:layout_width="2px"
+            android:layout_height="43px"
+            android:background="@color/white"/>
+        <TextView
+            android:id="@+id/tv_disconnect"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="27px"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:text="断开：0"/>
+
+    </LinearLayout>
+
+    <!--<com.baidu.mapapi.map.MapView
+        android:id="@+id/bmapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true" />-->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/bmapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true" />
+
+        <LinearLayout
+            android:id="@+id/ll_zoom"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="60dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/shape_map_zoom_bg">
+            <ImageButton
+                android:id="@+id/ib_large"
+                android:layout_height="40dp"
+                android:layout_width="40dp"
+                android:background="@drawable/selector_map_zoomin"
+                android:src="@drawable/icon_zoomin"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_line"
+                android:layout_marginLeft="6dp"
+                android:layout_marginRight="6dp"/>
+            <ImageButton
+                android:id="@+id/ib_small"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/selector_map_zoomout"
+                android:src="@drawable/icon_zoomout"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/ib_mode"
+            android:layout_height="40dp"
+            android:layout_width="40dp"
+            android:layout_above="@+id/ll_zoom"
+            android:layout_alignLeft="@+id/ll_zoom"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/selector_map_location"
+            android:src="@drawable/icon_maplayer"/>
+        <ImageButton
+            android:id="@+id/ib_loc"
+            android:layout_height="40dp"
+            android:layout_width="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignBottom="@+id/ll_zoom"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/selector_map_location"
+            android:src="@drawable/icon_location"/>
+    </RelativeLayout>
+
+
+
+
+
+
+
+
+</LinearLayout>

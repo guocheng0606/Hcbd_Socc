@@ -1,0 +1,126 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="30px"
+            android:paddingRight="30px">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="424px"
+                android:src="@drawable/image_about_us_03"
+                android:layout_marginTop="20px"
+                android:layout_gravity="center_horizontal"
+                android:scaleType="fitXY"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/culture_title_01"
+                android:drawableLeft="@drawable/ic_title_bar"
+                android:drawablePadding="15px"
+                android:layout_marginTop="20px"
+                android:textColor="@color/black"
+                android:textSize="28px"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_01"
+                android:layout_marginTop="20px"
+                android:lineSpacingExtra="15px"
+                android:layout_marginLeft="20px"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_title_bar"
+                android:drawablePadding="15px"
+                android:layout_marginTop="50px"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_title_02"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_02"
+                android:layout_marginTop="20px"
+                android:lineSpacingExtra="15px"
+                android:layout_marginLeft="20px"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_title_bar"
+                android:drawablePadding="15px"
+                android:layout_marginTop="50px"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_title_03"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_03"
+                android:layout_marginTop="20px"
+                android:lineSpacingExtra="15px"
+                android:layout_marginLeft="20px"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_title_bar"
+                android:drawablePadding="15px"
+                android:layout_marginTop="50px"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_title_04"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_04"
+                android:layout_marginTop="20px"
+                android:lineSpacingExtra="15px"
+                android:layout_marginLeft="20px"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_title_bar"
+                android:drawablePadding="15px"
+                android:layout_marginTop="50px"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_title_05"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="28px"
+                android:text="@string/culture_05"
+                android:lineSpacingExtra="15px"
+                android:layout_marginTop="20px"
+                android:layout_marginBottom="57px"
+                android:layout_marginLeft="20px"/>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
