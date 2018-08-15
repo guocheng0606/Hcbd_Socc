@@ -61,6 +61,8 @@
     <string name="input_subordinate_item">请选择所属项目</string>
     <string name="remark">备注</string>
     <string name="port">端口</string>
+    <string name="unit">单位</string>
+    <string name="input_unit">单位</string>
     <string name="input_port">请输入端口</string>
     <string name="input_remark">请输入备注</string>
     <string name="autogeneration">自动生成</string>

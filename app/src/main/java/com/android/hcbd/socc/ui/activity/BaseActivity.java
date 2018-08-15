@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
@@ -83,6 +84,10 @@ public class BaseActivity extends AppCompatActivity {
         config.setToDefaults();
         res.updateConfiguration(config,res.getDisplayMetrics() );
         return res;
+    }
+
+    public String formatText (String str){
+        return TextUtils.isEmpty(str) ? "" : str;
     }
 
     public void finishActivity(){

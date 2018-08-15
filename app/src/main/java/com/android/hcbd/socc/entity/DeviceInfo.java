@@ -9,29 +9,34 @@ import java.util.List;
 
 public class DeviceInfo implements Serializable {
 
+
     /**
-     * code : A00002
-     * createTime : 2017-04-17T14:11:05
-     * id : 2
-     * isRef : 0
+     * code : A00006
+     * createTime : 2018-08-08T20:55:36
+     * id : 71
+     * isRef : 1
      * modelContent : ["设备信息","/socc/deviceAction!"]
-     * name : R001
-     * names : A00002-R001
-     * operNames : S0000-Eingabe
+     * name : TCJZ0001
+     * names : A00006-TCJZ0001
+     * operNames : S0006-admin
      * orgCode : 027
      * paramsObj : null
-     * port : 9001
+     * port : 7003
      * project : {"addr":null,"code":"001","createTime":"2017-03-16T17:29:57","id":1,"modelContent":["工程项目","/socc/projectAction!"],"name":"华创工程部","names":"001-华创工程部","operNames":"S0000-Eingabe","orgCode":"027","owner":null,"paramsObj":null,"remark":"","state":"1","stateContent":"启用"}
      * remark :
-     * snNo : R00001
-     * soluTime : 300
+     * snNo : B0003
+     * soluTime : 3600
      * state : 1
      * stateContent : 启用
      * type : {"code":"001","createTime":"2017-03-16T17:39:22","id":1,"modelContent":["分析代码数据","/nsp/typeAction!"],"name":"GNSS","names":"001-GNSS","operNames":"S0000-Eingabe","orgCode":"027","paramsObj":null,"remark":"\\upload\\deviceType\\001.png","state":"1","stateContent":"启用","type":"A001","upload":null,"uploadContentType":null,"uploadFileName":null}
-     * upCode : A00001
-     * x : -11.46854637
-     * y : 35.25372451
-     * z : 0.4575979633
+     * unit : null
+     * upCode :
+     * upload : null
+     * uploadContentType : null
+     * uploadFileName : null
+     * x : 0.0
+     * y : 0.0
+     * z : 0.0
      */
 
     private String code;
@@ -51,7 +56,11 @@ public class DeviceInfo implements Serializable {
     private String state;
     private String stateContent;
     private TypeBean type;
+    private Object unit;
     private String upCode;
+    private Object upload;
+    private Object uploadContentType;
+    private Object uploadFileName;
     private double x;
     private double y;
     private double z;
@@ -193,12 +202,44 @@ public class DeviceInfo implements Serializable {
         this.type = type;
     }
 
+    public Object getUnit() {
+        return unit;
+    }
+
+    public void setUnit(Object unit) {
+        this.unit = unit;
+    }
+
     public String getUpCode() {
         return upCode;
     }
 
     public void setUpCode(String upCode) {
         this.upCode = upCode;
+    }
+
+    public Object getUpload() {
+        return upload;
+    }
+
+    public void setUpload(Object upload) {
+        this.upload = upload;
+    }
+
+    public Object getUploadContentType() {
+        return uploadContentType;
+    }
+
+    public void setUploadContentType(Object uploadContentType) {
+        this.uploadContentType = uploadContentType;
+    }
+
+    public Object getUploadFileName() {
+        return uploadFileName;
+    }
+
+    public void setUploadFileName(Object uploadFileName) {
+        this.uploadFileName = uploadFileName;
     }
 
     public double getX() {
@@ -380,24 +421,6 @@ public class DeviceInfo implements Serializable {
     }
 
     public static class TypeBean implements Serializable {
-        /**
-         * code : 001
-         * createTime : 2017-03-16T17:39:22
-         * id : 1
-         * modelContent : ["分析代码数据","/nsp/typeAction!"]
-         * name : GNSS
-         * names : 001-GNSS
-         * operNames : S0000-Eingabe
-         * orgCode : 027
-         * paramsObj : null
-         * remark : 001.png
-         * state : 1
-         * stateContent : 启用
-         * type : A001
-         * upload : null
-         * uploadContentType : null
-         * uploadFileName : null
-         */
 
         private String code;
         private String createTime;

@@ -34,8 +34,8 @@
             android:paddingLeft="15px"/>
     </RelativeLayout>
 
-    <WebView
-        android:id="@+id/webView"
+    <com.guocheng.echartlibrary.EChartWebView
+        android:id="@+id/echartWebView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

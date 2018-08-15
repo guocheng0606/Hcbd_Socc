@@ -255,6 +255,22 @@
                     android:minHeight="75px"
                     android:orientation="horizontal">
                     <TextView
+                        android:text="@string/unit"
+                        style="@style/device_info_text_title_style" />
+                    <TextView
+                        android:id="@+id/tv_unit"
+                        style="@style/device_info_text_style" />
+                </LinearLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@color/gray"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="75px"
+                    android:orientation="horizontal">
+                    <TextView
                         android:text="@string/remark"
                         style="@style/device_info_text_title_style" />
                     <TextView

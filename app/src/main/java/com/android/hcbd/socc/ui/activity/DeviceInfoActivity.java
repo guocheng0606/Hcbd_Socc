@@ -50,6 +50,8 @@ public class DeviceInfoActivity extends BaseActivity implements View.OnClickList
     ImageView iv_edit;
     @BindView(R.id.tv_port)
     TextView tvPort;
+    @BindView(R.id.tv_unit)
+    TextView tvUnit;
 
     private DeviceInfo deviceInfo;
 
@@ -84,19 +86,20 @@ public class DeviceInfoActivity extends BaseActivity implements View.OnClickList
     private void initData() {
         if (deviceInfo == null)
             return;
-        tv_code.setText(deviceInfo.getCode());
-        tvName.setText(deviceInfo.getName());
-        tvSn.setText(deviceInfo.getSnNo());
-        tvX.setText(String.valueOf(deviceInfo.getX()));
-        tvY.setText(String.valueOf(deviceInfo.getY()));
-        tvZ.setText(String.valueOf(deviceInfo.getZ()));
-        tvUploadCode.setText(deviceInfo.getUpCode());
+        tv_code.setText(formatText(deviceInfo.getCode()));
+        tvName.setText(formatText(deviceInfo.getName()));
+        tvSn.setText(formatText(deviceInfo.getSnNo()));
+        tvX.setText(formatText(String.valueOf(deviceInfo.getX())));
+        tvY.setText(formatText(String.valueOf(deviceInfo.getY())));
+        tvZ.setText(formatText(String.valueOf(deviceInfo.getZ())));
+        tvUploadCode.setText(formatText(deviceInfo.getUpCode()));
         tvIsRef.setText(deviceInfo.getIsRef().equals("1") ? "是" : "否");
-        tvSoluTime.setText(deviceInfo.getSoluTime());
-        tvSubordinateItem.setText(deviceInfo.getProject().getNames());
-        tvDeviceType.setText(deviceInfo.getType().getNames());
-        tvPort.setText(String.valueOf(deviceInfo.getPort()));
-        tvRemark.setText(deviceInfo.getRemark());
+        tvSoluTime.setText(formatText(deviceInfo.getSoluTime()));
+        tvSubordinateItem.setText(formatText(deviceInfo.getProject().getNames()));
+        tvDeviceType.setText(formatText(deviceInfo.getType().getNames()));
+        tvPort.setText(formatText(String.valueOf(deviceInfo.getPort())));
+        tvUnit.setText(formatText(String.valueOf(deviceInfo.getUnit())));
+        tvRemark.setText(formatText(deviceInfo.getRemark()));
     }
 
     @Override

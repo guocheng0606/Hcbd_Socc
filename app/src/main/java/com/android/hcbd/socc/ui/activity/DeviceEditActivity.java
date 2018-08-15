@@ -1,8 +1,10 @@
 package com.android.hcbd.socc.ui.activity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.text.TextUtils;
 import android.view.View;
@@ -83,6 +85,13 @@ public class DeviceEditActivity extends BaseActivity implements View.OnClickList
     LinearLayout ll_main;
     @BindView(R.id.et_port)
     EditText etPort;
+    @BindView(R.id.et_unit)
+    EditText etUnit;
+    @BindView(R.id.tv_xing1)
+    TextView tv_xing1;
+    @BindView(R.id.tv_xing2)
+    TextView tv_xing2;
+
 
     private DeviceInfo deviceInfo;
     private DeviceEditInfo deviceEditInfo;
@@ -109,27 +118,43 @@ public class DeviceEditActivity extends BaseActivity implements View.OnClickList
             if (msg.what == 0x11) {
                 ll_main.setVisibility(View.VISIBLE);
 
-                if (deviceInfo == null)
-                    return;
-                tvCode.setText(deviceInfo.getCode());
-                etName.setText(deviceInfo.getName());
-                etSn.setText(deviceInfo.getSnNo());
-                etX.setText(String.valueOf(deviceInfo.getX()));
-                etY.setText(String.valueOf(deviceInfo.getY()));
-                etH.setText(String.valueOf(deviceInfo.getZ()));
-                etUploadCode.setText(deviceInfo.getUpCode());
-                if (deviceInfo.getIsRef().equals("1")) {
-                    cbYes.setChecked(true);
-                    cbNo.setChecked(false);
+                if (deviceInfo == null) {
+                    if (deviceEditInfo.getProjectList().size() > 0)
+                        tvSubordinateItem.setText(""+deviceEditInfo.getProjectList().get(0).getNames());
+                    if(deviceEditInfo.getTypeList().size() > 0)
+                        tvDeviceType.setText(""+deviceEditInfo.getTypeList().get(0).getNames());
+                    tv_xing1.setVisibility(View.VISIBLE);
+                    tv_xing2.setVisibility(View.VISIBLE);
                 } else {
-                    cbYes.setChecked(false);
-                    cbNo.setChecked(true);
+                    tvCode.setText(formatText(deviceInfo.getCode()));
+                    etName.setText(formatText(deviceInfo.getName()));
+                    etSn.setText(formatText(deviceInfo.getSnNo()));
+                    etX.setText(formatText(String.valueOf(deviceInfo.getX())));
+                    etY.setText(formatText(String.valueOf(deviceInfo.getY())));
+                    etH.setText(formatText(String.valueOf(deviceInfo.getZ())));
+                    etUploadCode.setText(formatText(deviceInfo.getUpCode()));
+                    if (deviceInfo.getIsRef().equals("1")) {
+                        cbYes.setChecked(true);
+                        cbNo.setChecked(false);
+                    } else {
+                        cbYes.setChecked(false);
+                        cbNo.setChecked(true);
+                    }
+                    etSoluTime.setText(formatText(deviceInfo.getSoluTime()));
+                    tvSubordinateItem.setText(formatText(deviceInfo.getProject().getNames()));
+                    tvDeviceType.setText(formatText(deviceInfo.getType().getNames()));
+                    etPort.setText(formatText(String.valueOf(deviceInfo.getPort())));
+                    etUnit.setText(formatText(String.valueOf(deviceInfo.getUnit())));
+                    etRemark.setText(formatText(deviceInfo.getRemark()));
+                    if (deviceInfo.getType().getName().equals("GNSS")){
+                        tv_xing1.setVisibility(View.VISIBLE);
+                        tv_xing2.setVisibility(View.VISIBLE);
+                    } else {
+                        tv_xing1.setVisibility(View.GONE);
+                        tv_xing2.setVisibility(View.GONE);
+                    }
                 }
-                etSoluTime.setText(deviceInfo.getSoluTime());
-                tvSubordinateItem.setText(deviceInfo.getProject().getNames());
-                tvDeviceType.setText(deviceInfo.getType().getNames());
-                etPort.setText(String.valueOf(deviceInfo.getPort()));
-                etRemark.setText(deviceInfo.getRemark());
+
             }
         }
     };
@@ -254,13 +279,38 @@ public class DeviceEditActivity extends BaseActivity implements View.OnClickList
                 break;
             case R.id.iv_device_type:
             case R.id.tv_device_type:
-                String[] types = new String[deviceEditInfo.getTypeList().size()];
+                final String[] types = new String[deviceEditInfo.getTypeList().size()];
                 for (int i = 0; i < deviceEditInfo.getTypeList().size(); i++) {
                     types[i] = deviceEditInfo.getTypeList().get(i).getNames();
                 }
-                showDialog(types, tvDeviceType);
+                AlertDialog.Builder builder=new AlertDialog.Builder(this);  //先得到构造器
+                //builder.setTitle("请选择"); //设置标题
+                builder.setItems(types,new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        tvDeviceType.setText(types[which]);
+                        if (tvDeviceType.getText().toString().indexOf("GNSS") != -1) {
+                            tv_xing1.setVisibility(View.VISIBLE);
+                            tv_xing2.setVisibility(View.VISIBLE);
+                        } else {
+                            tv_xing1.setVisibility(View.GONE);
+                            tv_xing2.setVisibility(View.GONE);
+                        }
+
+                    }
+                });
+                builder.create().show();
                 break;
             case R.id.iv_save:
+                if (TextUtils.isEmpty(etName.getText().toString())) {
+                    ToastUtils.showShortToast(this, "请输入名称！");
+                    return;
+                }
+                if (TextUtils.isEmpty(etSn.getText().toString())) {
+                    ToastUtils.showShortToast(this, "请输入SN！");
+                    return;
+                }
                 if(TextUtils.isEmpty(etUploadCode.getText().toString())){
                     cbYes.setChecked(true);
                     cbNo.setChecked(false);
@@ -268,12 +318,28 @@ public class DeviceEditActivity extends BaseActivity implements View.OnClickList
                     cbYes.setChecked(false);
                     cbNo.setChecked(true);
                 }
+
+                if (tvDeviceType.getText().toString().indexOf("GNSS") != -1) {
+                    if (TextUtils.isEmpty(etSoluTime.getText().toString())) {
+                        ToastUtils.showShortToast(this, "请输入解算时间！");
+                        return;
+                    }
+                    if (TextUtils.isEmpty(etPort.getText().toString())) {
+                        ToastUtils.showShortToast(this, "请输入端口！");
+                        return;
+                    }
+                }
+
                 if (TextUtils.isEmpty(tvSubordinateItem.getText().toString())) {
                     ToastUtils.showShortToast(this, "请选择所属项目！");
                     return;
                 }
                 if (TextUtils.isEmpty(tvDeviceType.getText().toString())) {
                     ToastUtils.showShortToast(this, "请选择设备类型！");
+                    return;
+                }
+                if (TextUtils.isEmpty(etUnit.getText().toString())) {
+                    ToastUtils.showShortToast(this, "请输入单位！");
                     return;
                 }
                 saveHttp();
@@ -320,6 +386,7 @@ public class DeviceEditActivity extends BaseActivity implements View.OnClickList
                 .params("project.id", projectId)
                 .params("type.id", typeId)
                 .params("port", etPort.getText().toString())
+                .params("unit", etUnit.getText().toString())
                 .params("remark", etRemark.getText().toString())
                 .params("state", deviceInfo == null ? "1" : deviceInfo.getState())
                 .params("orgCode", MyApplication.getInstance().getLoginInfo().getUserInfo().getOrgCode())

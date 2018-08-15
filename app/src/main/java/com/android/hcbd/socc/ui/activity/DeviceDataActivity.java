@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -25,6 +26,7 @@ import com.jude.easyrecyclerview.adapter.RecyclerArrayAdapter;
 import com.jude.easyrecyclerview.decoration.DividerDecoration;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
 import com.lzy.okgo.request.base.Request;
 
@@ -36,7 +38,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -70,6 +74,12 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
         EventBus.getDefault().register(this);
 
         initView();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date(System.currentTimeMillis());
+        if (dataSearchInfo == null )
+            dataSearchInfo = new DataSearchInfo();
+        dataSearchInfo.setBeginTime(simpleDateFormat.format(date)+" 00:00");
+        dataSearchInfo.setEndTime(simpleDateFormat.format(date)+" 23:59");
         initHttpData();
         initListener();
     }
@@ -122,14 +132,23 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
     }
 
     private void initHttpData() {
+        HttpParams params = new HttpParams();
+        params.put("sessionOper.code", MyApplication.getInstance().getLoginInfo().getUserInfo().getCode());
+        params.put("sessionOper.orgCode", MyApplication.getInstance().getLoginInfo().getUserInfo().getOrgCode());
+        params.put("token", MyApplication.getInstance().getLoginInfo().getToken());
+        if (!TextUtils.isEmpty(dataSearchInfo.getDeviceName())) {
+            params.put("device.name", dataSearchInfo.getDeviceName());
+        }
+        if (!TextUtils.isEmpty(dataSearchInfo.getBeginTime())) {
+            params.put("beginTime", dataSearchInfo.getBeginTime());
+        }
+        if (!TextUtils.isEmpty(dataSearchInfo.getEndTime())) {
+            params.put("endTime", dataSearchInfo.getEndTime());
+        }
+        params.put("currentPage", currentPage);
+
         OkGo.<String>post(MyApplication.getInstance().getBsaeUrl()+HttpUrlUtils.device_data_url)
-                .params("sessionOper.code", MyApplication.getInstance().getLoginInfo().getUserInfo().getCode())
-                .params("sessionOper.orgCode", MyApplication.getInstance().getLoginInfo().getUserInfo().getOrgCode())
-                .params("token", MyApplication.getInstance().getLoginInfo().getToken())
-                .params("device.name", dataSearchInfo == null ? "" : dataSearchInfo.getDeviceName())
-                .params("beginTime", dataSearchInfo == null ? "1900-01-01 00:00" : dataSearchInfo.getBeginTime())
-                .params("endTime", dataSearchInfo == null ? "" : dataSearchInfo.getEndTime())
-                .params("currentPage",currentPage)
+                .params(params)
                 .execute(new StringCallback() {
                     @Override
                     public void onStart(Request<String, ? extends Request> request) {

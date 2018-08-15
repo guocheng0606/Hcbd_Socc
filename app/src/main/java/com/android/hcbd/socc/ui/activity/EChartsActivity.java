@@ -4,11 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.view.View;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageView;
 
 import com.android.hcbd.socc.MyApplication;
@@ -22,6 +20,7 @@ import com.android.hcbd.socc.util.LogUtils;
 import com.android.hcbd.socc.util.ProgressDialogUtils;
 import com.android.hcbd.socc.util.ToastUtils;
 import com.github.abel533.echarts.DataZoom;
+import com.github.abel533.echarts.Legend;
 import com.github.abel533.echarts.axis.CategoryAxis;
 import com.github.abel533.echarts.axis.ValueAxis;
 import com.github.abel533.echarts.code.DataZoomType;
@@ -33,8 +32,10 @@ import com.github.abel533.echarts.json.GsonOption;
 import com.github.abel533.echarts.series.Line;
 import com.github.abel533.echarts.series.Series;
 import com.google.gson.Gson;
+import com.guocheng.echartlibrary.EChartWebView;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
 import com.lzy.okgo.request.base.Request;
 
@@ -46,7 +47,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -59,9 +62,8 @@ public class EChartsActivity extends BaseActivity {
     ImageView ivBack;
     @BindView(R.id.iv_search)
     ImageView ivSearch;
-    @BindView(R.id.webView)
-    WebView mWebView;
-
+    @BindView(R.id.echartWebView)
+    EChartWebView echartWebView;
 
     private DataSearchInfo dataSearchInfo;
     private int currentPage = 1;
@@ -75,12 +77,13 @@ public class EChartsActivity extends BaseActivity {
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
 
-        WebSettings webSettings = mWebView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
-        webSettings.setSupportZoom(true);
-        webSettings.setDisplayZoomControls(true);
         ProgressDialogUtils.showLoading(this);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date date = new Date(System.currentTimeMillis());
+        if (dataSearchInfo == null )
+            dataSearchInfo = new DataSearchInfo();
+        dataSearchInfo.setBeginTime(simpleDateFormat.format(date)+" 00:00");
+        dataSearchInfo.setEndTime(simpleDateFormat.format(date)+" 23:59");
         initHttpData();
     }
 
@@ -103,14 +106,23 @@ public class EChartsActivity extends BaseActivity {
     }
 
     private void initHttpData() {
+        HttpParams params = new HttpParams();
+        params.put("sessionOper.code", MyApplication.getInstance().getLoginInfo().getUserInfo().getCode());
+        params.put("sessionOper.orgCode", MyApplication.getInstance().getLoginInfo().getUserInfo().getOrgCode());
+        params.put("token", MyApplication.getInstance().getLoginInfo().getToken());
+        if (!TextUtils.isEmpty(dataSearchInfo.getDeviceName())) {
+            params.put("device.name", dataSearchInfo.getDeviceName());
+        }
+        if (!TextUtils.isEmpty(dataSearchInfo.getBeginTime())) {
+            params.put("beginTime", dataSearchInfo.getBeginTime());
+        }
+        if (!TextUtils.isEmpty(dataSearchInfo.getEndTime())) {
+            params.put("endTime", dataSearchInfo.getEndTime());
+        }
+        params.put("currentPage", currentPage);
+
         OkGo.<String>post(MyApplication.getInstance().getBsaeUrl()+HttpUrlUtils.device_data_url)
-                .params("sessionOper.code", MyApplication.getInstance().getLoginInfo().getUserInfo().getCode())
-                .params("sessionOper.orgCode", MyApplication.getInstance().getLoginInfo().getUserInfo().getOrgCode())
-                .params("token", MyApplication.getInstance().getLoginInfo().getToken())
-                .params("device.name", dataSearchInfo == null ? "" : dataSearchInfo.getDeviceName())
-                .params("beginTime", dataSearchInfo == null ? "" : dataSearchInfo.getBeginTime())
-                .params("endTime", dataSearchInfo == null ? "" : dataSearchInfo.getEndTime())
-                .params("currentPage", currentPage)
+                .params(params)
                 .execute(new StringCallback() {
                     @Override
                     public void onStart(Request<String, ? extends Request> request) {
@@ -155,19 +167,13 @@ public class EChartsActivity extends BaseActivity {
                                 },1000);
 
                             } else {
-                                mWebView.removeJavascriptInterface("Android");
-                                mWebView.addJavascriptInterface(new WebAppInterface(EChartsActivity.this), "Android");
-                                mWebView.loadUrl("file:///android_asset/echart/echart.html");
-                                mWebView.setWebViewClient(new WebViewClient() {
+                                //设置数据源
+                                echartWebView.setDataSource(new EChartWebView.DataSource() {
                                     @Override
-                                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                                        view.loadUrl(url);
-                                        return true;
-                                    }
-
-                                    @Override
-                                    public void onPageFinished(WebView view, String url) {
-                                        mWebView.loadUrl("javascript:loadALineChart();");
+                                    public GsonOption markLineChartOptions() {
+                                        GsonOption option = getLineChartOption();
+                                        ProgressDialogUtils.dismissLoading();
+                                        return option;
                                     }
                                 });
 
@@ -207,6 +213,90 @@ public class EChartsActivity extends BaseActivity {
                 startActivity(intent);
                 break;
         }
+    }
+
+    public GsonOption getLineChartOption() {
+        GsonOption option = new GsonOption();
+
+        Legend legend = new Legend();
+        legend.data("DX","DY","DZ","LEN","X","Y","Z").selected("X",false).selected("Y",false).selected("Z",false);
+        option.legend(legend);
+
+        option.toolbox().show(true).feature(Tool.mark, Tool.dataView, new MagicType(Magic.line, Magic.bar), Tool.restore);
+
+        option.calculable(true);
+        option.tooltip().trigger(Trigger.axis).formatter("{b}<br/>DX：{c}<br/>DY：{c1}<br/>DZ：{c2}<br/>LEN：{c3}<br/>X：{c4}<br/>Y：{c5}<br/>Z：{c6}");
+
+        List<String> mAxisXValues = new ArrayList<>();
+
+        for (int i = 0; i < dataInfoList.size(); i++) {
+            mAxisXValues.add(dataInfoList.get(i).getDataTime());
+        }
+
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.axisLine().onZero(false);
+        categoryAxis.boundaryGap(false);
+        categoryAxis.setData(mAxisXValues);
+        option.xAxis(categoryAxis);
+
+        ValueAxis valueAxis = new ValueAxis();
+        option.yAxis(valueAxis);
+
+        DataZoom dataZoom = new DataZoom();
+        dataZoom.setType(DataZoomType.slider);
+        dataZoom.setStart(0);
+        dataZoom.setEnd(16);
+        option.dataZoom(dataZoom);
+
+        List<Double> p0 = new ArrayList<>();
+        List<Double> p1 = new ArrayList<>();
+        List<Double> p2 = new ArrayList<>();
+        List<Double> p3 = new ArrayList<>();
+        List<Double> p4 = new ArrayList<>();
+        List<Double> p5 = new ArrayList<>();
+        List<Double> p6 = new ArrayList<>();
+        for (int i = 0; i < dataInfoList.size(); i++) {
+            p1.add(Double.valueOf(dataInfoList.get(i).getD1()));
+            p2.add(Double.valueOf(dataInfoList.get(i).getD2()));
+            p3.add(Double.valueOf(dataInfoList.get(i).getD3()));
+            p4.add(Double.valueOf(dataInfoList.get(i).getD4()));
+            p5.add(Double.valueOf(dataInfoList.get(i).getD5()));
+            p6.add(Double.valueOf(dataInfoList.get(i).getD6()));
+            p0.add(Double.valueOf(dataInfoList.get(i).getD0()));
+        }
+
+        List<Series> lines = new ArrayList<>();
+
+        Line line0 = new Line();
+        Line line1 = new Line();
+        Line line2 = new Line();
+        Line line3 = new Line();
+        Line line4 = new Line();
+        Line line5 = new Line();
+        Line line6 = new Line();
+        line0.setData(p0);
+        line1.setData(p1);
+        line2.setData(p2);
+        line3.setData(p3);
+        line4.setData(p4);
+        line5.setData(p5);
+        line6.setData(p6);
+        line1.smooth(false).name("DX").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        line2.smooth(false).name("DY").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        line3.smooth(false).name("DZ").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        line0.smooth(false).name("LEN").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        line4.smooth(false).name("X").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        line5.smooth(false).name("Y").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        line6.smooth(false).name("Z").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        lines.add(line1);
+        lines.add(line2);
+        lines.add(line3);
+        lines.add(line0);
+        lines.add(line4);
+        lines.add(line5);
+        lines.add(line6);
+        option.setSeries(lines);
+        return option;
     }
 
     /**

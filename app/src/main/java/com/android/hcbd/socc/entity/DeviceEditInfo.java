@@ -48,12 +48,28 @@ public class DeviceEditInfo implements Serializable{
 
     public static class DataInfo implements Serializable{
 
+        /**
+         * isRef : 1
+         * modelContent : ["设备信息","/socc/deviceAction!"]
+         * port : 7003
+         * project : {"addr":null,"code":"001","createTime":"2017-03-16T17:29:57","id":1,"modelContent":["工程项目","/socc/projectAction!"],"name":"华创工程部","names":"001-华创工程部","operNames":"S0000-Eingabe","orgCode":"027","owner":null,"paramsObj":null,"remark":"","state":"1","stateContent":"启用"}
+         * snNo : B0003
+         * soluTime : 3600
+         * type : {"code":"001","createTime":"2017-03-16T17:39:22","id":1,"modelContent":["分析代码数据","/nsp/typeAction!"],"name":"GNSS","names":"001-GNSS","operNames":"S0000-Eingabe","orgCode":"027","paramsObj":null,"remark":"\\upload\\deviceType\\001.png","state":"1","stateContent":"启用","type":"A001","upload":null,"uploadContentType":null,"uploadFileName":null}
+         * unit : null
+         * upCode :
+         * x : 0.0
+         * y : 0.0
+         * z : 0.0
+         */
+
         private String isRef;
         private int port;
         private ProjectBean project;
         private String snNo;
         private String soluTime;
         private TypeBean type;
+        private Object unit;
         private String upCode;
         private double x;
         private double y;
@@ -108,6 +124,14 @@ public class DeviceEditInfo implements Serializable{
             this.type = type;
         }
 
+        public Object getUnit() {
+            return unit;
+        }
+
+        public void setUnit(Object unit) {
+            this.unit = unit;
+        }
+
         public String getUpCode() {
             return upCode;
         }
@@ -149,6 +173,22 @@ public class DeviceEditInfo implements Serializable{
         }
 
         public static class ProjectBean implements Serializable {
+            /**
+             * addr : null
+             * code : 001
+             * createTime : 2017-03-16T17:29:57
+             * id : 1
+             * modelContent : ["工程项目","/socc/projectAction!"]
+             * name : 华创工程部
+             * names : 001-华创工程部
+             * operNames : S0000-Eingabe
+             * orgCode : 027
+             * owner : null
+             * paramsObj : null
+             * remark :
+             * state : 1
+             * stateContent : 启用
+             */
 
             private Object addr;
             private String code;
@@ -429,6 +469,35 @@ public class DeviceEditInfo implements Serializable{
 
     public static class Device implements Serializable{
 
+        /**
+         * code : A00006
+         * createTime : 2018-08-08T20:55:36
+         * id : 71
+         * isRef : 1
+         * modelContent : ["设备信息","/socc/deviceAction!"]
+         * name : TCJZ0001
+         * names : A00006-TCJZ0001
+         * operNames : S0006-admin
+         * orgCode : 027
+         * paramsObj : null
+         * port : 7003
+         * project : {"addr":null,"code":"001","createTime":"2017-03-16T17:29:57","id":1,"modelContent":["工程项目","/socc/projectAction!"],"name":"华创工程部","names":"001-华创工程部","operNames":"S0000-Eingabe","orgCode":"027","owner":null,"paramsObj":null,"remark":"","state":"1","stateContent":"启用"}
+         * remark :
+         * snNo : B0003
+         * soluTime : 3600
+         * state : 1
+         * stateContent : 启用
+         * type : {"code":"001","createTime":"2017-03-16T17:39:22","id":1,"modelContent":["分析代码数据","/nsp/typeAction!"],"name":"GNSS","names":"001-GNSS","operNames":"S0000-Eingabe","orgCode":"027","paramsObj":null,"remark":"\\upload\\deviceType\\001.png","state":"1","stateContent":"启用","type":"A001","upload":null,"uploadContentType":null,"uploadFileName":null}
+         * unit : null
+         * upCode :
+         * upload : null
+         * uploadContentType : null
+         * uploadFileName : null
+         * x : 0.0
+         * y : 0.0
+         * z : 0.0
+         */
+
         private String code;
         private String createTime;
         private int id;
@@ -446,7 +515,11 @@ public class DeviceEditInfo implements Serializable{
         private String state;
         private String stateContent;
         private TypeBean type;
+        private Object unit;
         private String upCode;
+        private Object upload;
+        private Object uploadContentType;
+        private Object uploadFileName;
         private double x;
         private double y;
         private double z;
@@ -588,12 +661,44 @@ public class DeviceEditInfo implements Serializable{
             this.type = type;
         }
 
+        public Object getUnit() {
+            return unit;
+        }
+
+        public void setUnit(Object unit) {
+            this.unit = unit;
+        }
+
         public String getUpCode() {
             return upCode;
         }
 
         public void setUpCode(String upCode) {
             this.upCode = upCode;
+        }
+
+        public Object getUpload() {
+            return upload;
+        }
+
+        public void setUpload(Object upload) {
+            this.upload = upload;
+        }
+
+        public Object getUploadContentType() {
+            return uploadContentType;
+        }
+
+        public void setUploadContentType(Object uploadContentType) {
+            this.uploadContentType = uploadContentType;
+        }
+
+        public Object getUploadFileName() {
+            return uploadFileName;
+        }
+
+        public void setUploadFileName(Object uploadFileName) {
+            this.uploadFileName = uploadFileName;
         }
 
         public double getX() {
@@ -629,6 +734,22 @@ public class DeviceEditInfo implements Serializable{
         }
 
         public static class ProjectBean implements Serializable {
+            /**
+             * addr : null
+             * code : 001
+             * createTime : 2017-03-16T17:29:57
+             * id : 1
+             * modelContent : ["工程项目","/socc/projectAction!"]
+             * name : 华创工程部
+             * names : 001-华创工程部
+             * operNames : S0000-Eingabe
+             * orgCode : 027
+             * owner : null
+             * paramsObj : null
+             * remark :
+             * state : 1
+             * stateContent : 启用
+             */
 
             private Object addr;
             private String code;

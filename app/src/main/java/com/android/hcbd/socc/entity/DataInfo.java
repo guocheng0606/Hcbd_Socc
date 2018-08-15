@@ -9,46 +9,63 @@ import java.util.List;
 
 public class DataInfo implements Serializable {
 
+
     /**
-     * beginTime : null
+     * beginTime : 2018-08-13 00:00
      * code : null
-     * createTime : 2017-04-27T15:44:06
-     * dataTime : 2017-04-17 08:15
-     * device : {"code":"A00002","createTime":"2017-04-21T14:52:40","id":2,"isRef":"0","modelContent":["设备信息","/socc/deviceAction!"],"name":"R001","names":"A00002-R001","operNames":"S0006-admin","orgCode":"027","paramsObj":null,"port":0,"project":{"addr":null,"code":"001","createTime":"2017-03-16T17:29:57","id":1,"modelContent":["工程项目","/socc/projectAction!"],"name":"华创工程部","names":"001-华创工程部","operNames":"S0000-Eingabe","orgCode":"027","owner":null,"paramsObj":null,"remark":"","state":"1","stateContent":"启用"},"remark":"tttt","snNo":"R00001","soluTime":"300","state":"1","stateContent":"启用","type":{"code":"001","createTime":"2017-03-16T17:39:22","id":1,"modelContent":["分析代码数据","/nsp/typeAction!"],"name":"GNSS","names":"001-GNSS","operNames":"S0000-Eingabe","orgCode":"027","paramsObj":null,"remark":"\\upload\\deviceType\\001.png","state":"1","stateContent":"启用","type":"A001","upload":null,"uploadContentType":null,"uploadFileName":null},"upCode":"A00001","x":-11.46854637,"y":35.25372451,"z":0.4575979633}
-     * dx : 8.2525E-4
-     * dy : 6.4779E-4
-     * dz : 4.54575E-4
-     * endTime : null
-     * id : 408
+     * createTime : 2018-08-13T10:39:02
+     * d0 : 0.04657
+     * d1 : -12.59020
+     * d2 : -23.88510
+     * d3 : -37.94870
+     * d4 : 42.45490
+     * d5 : -64.43080
+     * d6 : 1.00315
+     * dataTime : 2018-08-13 09:00
+     * device : {"code":"A00007","createTime":"2018-08-08T20:55:51","id":72,"isRef":"0","modelContent":["设备信息","/socc/deviceAction!"],"name":"TCJC001","names":"A00007-TCJC001","operNames":"S0006-admin","orgCode":"027","paramsObj":null,"port":7503,"project":{"addr":null,"code":"001","createTime":"2017-03-16T17:29:57","id":1,"modelContent":["工程项目","/socc/projectAction!"],"name":"华创工程部","names":"001-华创工程部","operNames":"S0000-Eingabe","orgCode":"027","owner":null,"paramsObj":null,"remark":"","state":"1","stateContent":"启用"},"remark":"","snNo":"R0003","soluTime":"3600","state":"1","stateContent":"启用","type":{"code":"001","createTime":"2017-03-16T17:39:22","id":1,"modelContent":["分析代码数据","/nsp/typeAction!"],"name":"GNSS","names":"001-GNSS","operNames":"S0000-Eingabe","orgCode":"027","paramsObj":null,"remark":"\\upload\\deviceType\\001.png","state":"1","stateContent":"启用","type":"A001","upload":null,"uploadContentType":null,"uploadFileName":null},"unit":null,"upCode":"A00006","upload":null,"uploadContentType":null,"uploadFileName":null,"x":0,"y":0,"z":0}
+     * dx : -0.0125902
+     * dy : -0.0238851
+     * dz : -0.0379487
+     * endTime : 2018-08-13 23:59
+     * id : 8605
      * modelContent : ["设备数据","/socc/deviceDataAction!"]
      * name : null
      * names : null-null
      * operNames : null
      * orgCode : null
      * paramsObj : null
+     * ratio : null
      * remark : null
      * state : null
      * stateContent : 历史
-     * x : -11.4658
-     * y : 35.252
-     * z : 0.462417
+     * x : 42.4549
+     * y : -64.4308
+     * z : 1.00315
      */
 
-    private Object beginTime;
+    private String beginTime;
     private Object code;
     private String createTime;
+    private String d0;
+    private String d1;
+    private String d2;
+    private String d3;
+    private String d4;
+    private String d5;
+    private String d6;
     private String dataTime;
     private DeviceBean device;
     private double dx;
     private double dy;
     private double dz;
-    private Object endTime;
+    private String endTime;
     private int id;
     private Object name;
     private String names;
     private Object operNames;
     private Object orgCode;
     private Object paramsObj;
+    private Object ratio;
     private Object remark;
     private Object state;
     private String stateContent;
@@ -57,11 +74,11 @@ public class DataInfo implements Serializable {
     private double z;
     private List<String> modelContent;
 
-    public Object getBeginTime() {
+    public String getBeginTime() {
         return beginTime;
     }
 
-    public void setBeginTime(Object beginTime) {
+    public void setBeginTime(String beginTime) {
         this.beginTime = beginTime;
     }
 
@@ -79,6 +96,62 @@ public class DataInfo implements Serializable {
 
     public void setCreateTime(String createTime) {
         this.createTime = createTime;
+    }
+
+    public String getD0() {
+        return d0;
+    }
+
+    public void setD0(String d0) {
+        this.d0 = d0;
+    }
+
+    public String getD1() {
+        return d1;
+    }
+
+    public void setD1(String d1) {
+        this.d1 = d1;
+    }
+
+    public String getD2() {
+        return d2;
+    }
+
+    public void setD2(String d2) {
+        this.d2 = d2;
+    }
+
+    public String getD3() {
+        return d3;
+    }
+
+    public void setD3(String d3) {
+        this.d3 = d3;
+    }
+
+    public String getD4() {
+        return d4;
+    }
+
+    public void setD4(String d4) {
+        this.d4 = d4;
+    }
+
+    public String getD5() {
+        return d5;
+    }
+
+    public void setD5(String d5) {
+        this.d5 = d5;
+    }
+
+    public String getD6() {
+        return d6;
+    }
+
+    public void setD6(String d6) {
+        this.d6 = d6;
     }
 
     public String getDataTime() {
@@ -121,11 +194,11 @@ public class DataInfo implements Serializable {
         this.dz = dz;
     }
 
-    public Object getEndTime() {
+    public String getEndTime() {
         return endTime;
     }
 
-    public void setEndTime(Object endTime) {
+    public void setEndTime(String endTime) {
         this.endTime = endTime;
     }
 
@@ -175,6 +248,14 @@ public class DataInfo implements Serializable {
 
     public void setParamsObj(Object paramsObj) {
         this.paramsObj = paramsObj;
+    }
+
+    public Object getRatio() {
+        return ratio;
+    }
+
+    public void setRatio(Object ratio) {
+        this.ratio = ratio;
     }
 
     public Object getRemark() {
@@ -235,28 +316,32 @@ public class DataInfo implements Serializable {
 
     public static class DeviceBean implements Serializable {
         /**
-         * code : A00002
-         * createTime : 2017-04-21T14:52:40
-         * id : 2
+         * code : A00007
+         * createTime : 2018-08-08T20:55:51
+         * id : 72
          * isRef : 0
          * modelContent : ["设备信息","/socc/deviceAction!"]
-         * name : R001
-         * names : A00002-R001
+         * name : TCJC001
+         * names : A00007-TCJC001
          * operNames : S0006-admin
          * orgCode : 027
          * paramsObj : null
-         * port : 0
+         * port : 7503
          * project : {"addr":null,"code":"001","createTime":"2017-03-16T17:29:57","id":1,"modelContent":["工程项目","/socc/projectAction!"],"name":"华创工程部","names":"001-华创工程部","operNames":"S0000-Eingabe","orgCode":"027","owner":null,"paramsObj":null,"remark":"","state":"1","stateContent":"启用"}
-         * remark : tttt
-         * snNo : R00001
-         * soluTime : 300
+         * remark :
+         * snNo : R0003
+         * soluTime : 3600
          * state : 1
          * stateContent : 启用
          * type : {"code":"001","createTime":"2017-03-16T17:39:22","id":1,"modelContent":["分析代码数据","/nsp/typeAction!"],"name":"GNSS","names":"001-GNSS","operNames":"S0000-Eingabe","orgCode":"027","paramsObj":null,"remark":"\\upload\\deviceType\\001.png","state":"1","stateContent":"启用","type":"A001","upload":null,"uploadContentType":null,"uploadFileName":null}
-         * upCode : A00001
-         * x : -11.46854637
-         * y : 35.25372451
-         * z : 0.4575979633
+         * unit : null
+         * upCode : A00006
+         * upload : null
+         * uploadContentType : null
+         * uploadFileName : null
+         * x : 0.0
+         * y : 0.0
+         * z : 0.0
          */
 
         private String code;
@@ -276,7 +361,11 @@ public class DataInfo implements Serializable {
         private String state;
         private String stateContent;
         private TypeBean type;
+        private Object unit;
         private String upCode;
+        private Object upload;
+        private Object uploadContentType;
+        private Object uploadFileName;
         private double x;
         private double y;
         private double z;
@@ -418,12 +507,44 @@ public class DataInfo implements Serializable {
             this.type = type;
         }
 
+        public Object getUnit() {
+            return unit;
+        }
+
+        public void setUnit(Object unit) {
+            this.unit = unit;
+        }
+
         public String getUpCode() {
             return upCode;
         }
 
         public void setUpCode(String upCode) {
             this.upCode = upCode;
+        }
+
+        public Object getUpload() {
+            return upload;
+        }
+
+        public void setUpload(Object upload) {
+            this.upload = upload;
+        }
+
+        public Object getUploadContentType() {
+            return uploadContentType;
+        }
+
+        public void setUploadContentType(Object uploadContentType) {
+            this.uploadContentType = uploadContentType;
+        }
+
+        public Object getUploadFileName() {
+            return uploadFileName;
+        }
+
+        public void setUploadFileName(Object uploadFileName) {
+            this.uploadFileName = uploadFileName;
         }
 
         public double getX() {
@@ -605,24 +726,6 @@ public class DataInfo implements Serializable {
         }
 
         public static class TypeBean implements Serializable {
-            /**
-             * code : 001
-             * createTime : 2017-03-16T17:39:22
-             * id : 1
-             * modelContent : ["分析代码数据","/nsp/typeAction!"]
-             * name : GNSS
-             * names : 001-GNSS
-             * operNames : S0000-Eingabe
-             * orgCode : 027
-             * paramsObj : null
-             * remark : 001.png
-             * state : 1
-             * stateContent : 启用
-             * type : A001
-             * upload : null
-             * uploadContentType : null
-             * uploadFileName : null
-             */
 
             private String code;
             private String createTime;
