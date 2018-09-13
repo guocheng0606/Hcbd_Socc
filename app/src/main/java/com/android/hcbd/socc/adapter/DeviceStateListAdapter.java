@@ -28,6 +28,10 @@ public class DeviceStateListAdapter extends BaseAdapter {
         this.dataInfoList = dataInfoList;
     }
 
+    public List<DeviceStateListInfo.DataInfo> getAllList() {
+        return dataInfoList;
+    }
+
     @Override
     public int getCount() {
         return  dataInfoList == null ? 0 : dataInfoList.size();

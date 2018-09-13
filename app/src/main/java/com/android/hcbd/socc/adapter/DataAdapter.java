@@ -46,7 +46,7 @@ public class DataAdapter extends BaseAdapter{
     public View getView(int i, View view, ViewGroup viewGroup) {
         ViewHolder holder = null;
         if(view == null){
-            view = LayoutInflater.from(context).inflate(R.layout.item_data_list_layout,viewGroup,false);
+            view = LayoutInflater.from(context).inflate(R.layout.item_data_list_layout1,viewGroup,false);
             holder = new ViewHolder(view);
             view.setTag(holder);
             AutoUtils.autoSize(view);

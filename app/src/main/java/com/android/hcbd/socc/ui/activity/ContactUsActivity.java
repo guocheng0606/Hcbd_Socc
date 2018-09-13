@@ -3,6 +3,7 @@ package com.android.hcbd.socc.ui.activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ZoomControls;
 
 import com.android.hcbd.socc.R;
 import com.baidu.mapapi.map.BaiduMap;
@@ -35,6 +36,11 @@ public class ContactUsActivity extends BaseActivity implements View.OnClickListe
 
         mMapView.onCreate(this, savedInstanceState);
         mBaiduMap = mMapView.getMap();
+        // 隐藏百度的LOGO
+        View child = mMapView.getChildAt(1);
+        if (child != null && (child instanceof ImageView || child instanceof ZoomControls)) {
+            child.setVisibility(View.INVISIBLE);
+        }
         //普通地图
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
         mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(17));

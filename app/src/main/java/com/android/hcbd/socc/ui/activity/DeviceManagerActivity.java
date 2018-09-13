@@ -7,7 +7,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import com.android.hcbd.socc.MyApplication;
 import com.android.hcbd.socc.R;
 import com.android.hcbd.socc.entity.DeviceInfo;
@@ -27,19 +26,17 @@ import com.lzy.okgo.model.Response;
 import com.lzy.okgo.request.base.Request;
 import com.wyt.searchbox.SearchFragment;
 import com.wyt.searchbox.custom.IOnSearchClickListener;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
 
 public class DeviceManagerActivity extends BaseActivity implements View.OnClickListener ,RecyclerArrayAdapter.OnLoadMoreListener, SwipeRefreshLayout.OnRefreshListener{
 
@@ -191,7 +188,7 @@ public class DeviceManagerActivity extends BaseActivity implements View.OnClickL
             @Override
             public void onItemClick(int position) {
                 Intent intent = new Intent(DeviceManagerActivity.this,DeviceInfoActivity.class);
-                intent.putExtra("data",deviceInfoList.get(position));
+                intent.putExtra("data",adapter.getAllData().get(position));
                 startActivity(intent);
             }
         });

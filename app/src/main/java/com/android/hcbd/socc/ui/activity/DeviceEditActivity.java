@@ -87,10 +87,13 @@ public class DeviceEditActivity extends BaseActivity implements View.OnClickList
     EditText etPort;
     @BindView(R.id.et_unit)
     EditText etUnit;
+    @BindView(R.id.et_position)
+    EditText etPosition;
     @BindView(R.id.tv_xing1)
     TextView tv_xing1;
     @BindView(R.id.tv_xing2)
     TextView tv_xing2;
+
 
 
     private DeviceInfo deviceInfo;
@@ -146,6 +149,9 @@ public class DeviceEditActivity extends BaseActivity implements View.OnClickList
                     etPort.setText(formatText(String.valueOf(deviceInfo.getPort())));
                     etUnit.setText(formatText(String.valueOf(deviceInfo.getUnit())));
                     etRemark.setText(formatText(deviceInfo.getRemark()));
+
+                    etPosition.setText(formatText(deviceInfo.getPosition()));
+
                     if (deviceInfo.getType().getName().equals("GNSS")){
                         tv_xing1.setVisibility(View.VISIBLE);
                         tv_xing2.setVisibility(View.VISIBLE);
@@ -387,6 +393,7 @@ public class DeviceEditActivity extends BaseActivity implements View.OnClickList
                 .params("type.id", typeId)
                 .params("port", etPort.getText().toString())
                 .params("unit", etUnit.getText().toString())
+                .params("position", etPosition.getText().toString())
                 .params("remark", etRemark.getText().toString())
                 .params("state", deviceInfo == null ? "1" : deviceInfo.getState())
                 .params("orgCode", MyApplication.getInstance().getLoginInfo().getUserInfo().getOrgCode())

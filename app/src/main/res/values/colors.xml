@@ -16,4 +16,23 @@
     <color name="gray2">#cdcdcd</color>
     <color name="divider_line">#e5e5e5</color>
     <color name="gray01">#808080</color>
+
+    <color name="common_bg">#f0f0f3</color>
+    <color name="viewfinder_frame">#929292</color>
+    <color name="dark_bg_70p">#bb000000</color>
+    <color name="common_sub_text">#888888</color>
+    <color name="source_detection_btn_color">#48a9fb</color>
+    <color name="gray_text">#adadad</color>
+    <color name="quality_focused_color">#448cf3</color>
+    <!-- background -->
+    <color name="application_bg">@color/common_bg</color>
+    <color name="common_hint_text">#adadad</color>
+    <color name="more_color">#3ea6ef</color>
+    <color name="play_translucent_bg">#c0000000</color>
+    <color name="remotelist_item_duration_text_color">#c6c6c6</color>
+    <color name="common_text">#333333</color>
+    <color name="common_line">#c8c7cc</color>
+    <color name="black_bg">#000000</color>
+
+
 </resources>

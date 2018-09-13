@@ -10,6 +10,7 @@ public class DataSearchInfo implements Serializable {
     private String deviceName;
     private String beginTime;
     private String endTime;
+    private boolean isGnss;
 
     public String getDeviceName() {
         return deviceName;
@@ -33,5 +34,13 @@ public class DataSearchInfo implements Serializable {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public boolean isGnss() {
+        return isGnss;
+    }
+
+    public void setGnss(boolean gnss) {
+        isGnss = gnss;
     }
 }

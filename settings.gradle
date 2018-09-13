@@ -1,1 +1,1 @@
-include ':app', ':searchbox', ':echartlibrary'
+include ':app', ':searchbox', ':echartlibrary', ':ezvizdemo'

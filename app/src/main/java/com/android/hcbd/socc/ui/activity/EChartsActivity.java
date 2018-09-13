@@ -1,12 +1,9 @@
 package com.android.hcbd.socc.ui.activity;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
-import android.webkit.JavascriptInterface;
 import android.widget.ImageView;
 
 import com.android.hcbd.socc.MyApplication;
@@ -14,7 +11,6 @@ import com.android.hcbd.socc.R;
 import com.android.hcbd.socc.entity.DataInfo;
 import com.android.hcbd.socc.entity.DataSearchInfo;
 import com.android.hcbd.socc.entity.DeviceInfo;
-import com.android.hcbd.socc.event.MessageEvent;
 import com.android.hcbd.socc.util.HttpUrlUtils;
 import com.android.hcbd.socc.util.LogUtils;
 import com.android.hcbd.socc.util.ProgressDialogUtils;
@@ -39,17 +35,11 @@ import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
 import com.lzy.okgo.request.base.Request;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -60,8 +50,6 @@ public class EChartsActivity extends BaseActivity {
 
     @BindView(R.id.iv_back)
     ImageView ivBack;
-    @BindView(R.id.iv_search)
-    ImageView ivSearch;
     @BindView(R.id.echartWebView)
     EChartWebView echartWebView;
 
@@ -75,34 +63,15 @@ public class EChartsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_echarts);
         ButterKnife.bind(this);
-        EventBus.getDefault().register(this);
 
         ProgressDialogUtils.showLoading(this);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date(System.currentTimeMillis());
-        if (dataSearchInfo == null )
-            dataSearchInfo = new DataSearchInfo();
-        dataSearchInfo.setBeginTime(simpleDateFormat.format(date)+" 00:00");
-        dataSearchInfo.setEndTime(simpleDateFormat.format(date)+" 23:59");
+        dataSearchInfo = (DataSearchInfo) getIntent().getSerializableExtra("search_info");
         initHttpData();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        switch (event.getEventId()) {
-            case MessageEvent.EVENT_DATA_SEARCH:
-                dataSearchInfo = (DataSearchInfo) event.getObj();
-                ProgressDialogUtils.showLoading(this);
-                currentPage = 1;
-                initHttpData();
-                break;
-        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
     }
 
     private void initHttpData() {
@@ -171,7 +140,12 @@ public class EChartsActivity extends BaseActivity {
                                 echartWebView.setDataSource(new EChartWebView.DataSource() {
                                     @Override
                                     public GsonOption markLineChartOptions() {
-                                        GsonOption option = getLineChartOption();
+                                        GsonOption option = null;
+                                        if (dataSearchInfo.isGnss()){
+                                            option = getLineChartOption1();
+                                        } else {
+                                            option = getLineChartOption2();
+                                        }
                                         ProgressDialogUtils.dismissLoading();
                                         return option;
                                     }
@@ -200,22 +174,16 @@ public class EChartsActivity extends BaseActivity {
 
     }
 
-    @OnClick({R.id.iv_back, R.id.iv_search})
+    @OnClick({R.id.iv_back})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_back:
                 finishActivity();
                 break;
-            case R.id.iv_search:
-                Intent intent = new Intent(this, DataSearchActivity.class);
-                intent.putExtra("search_info", dataSearchInfo);
-                intent.putExtra("deviceList", (Serializable) deviceList);
-                startActivity(intent);
-                break;
         }
     }
 
-    public GsonOption getLineChartOption() {
+    public GsonOption getLineChartOption1() {
         GsonOption option = new GsonOption();
 
         Legend legend = new Legend();
@@ -245,7 +213,7 @@ public class EChartsActivity extends BaseActivity {
         DataZoom dataZoom = new DataZoom();
         dataZoom.setType(DataZoomType.slider);
         dataZoom.setStart(0);
-        dataZoom.setEnd(16);
+        dataZoom.setEnd(100);
         option.dataZoom(dataZoom);
 
         List<Double> p0 = new ArrayList<>();
@@ -299,21 +267,75 @@ public class EChartsActivity extends BaseActivity {
         return option;
     }
 
+    public GsonOption getLineChartOption2() {
+        GsonOption option = new GsonOption();
+
+        Legend legend = new Legend();
+        legend.data("数值","温度");
+        option.legend(legend);
+
+        option.toolbox().show(true).feature(Tool.mark, Tool.dataView, new MagicType(Magic.line, Magic.bar), Tool.restore);
+
+        option.calculable(true);
+        option.tooltip().trigger(Trigger.axis).formatter("{b}<br/>数值：{c}<br/>温度：{c1}");
+
+        List<String> mAxisXValues = new ArrayList<>();
+
+        for (int i = 0; i < dataInfoList.size(); i++) {
+            mAxisXValues.add(dataInfoList.get(i).getDataTime());
+        }
+
+        CategoryAxis categoryAxis = new CategoryAxis();
+        categoryAxis.axisLine().onZero(false);
+        categoryAxis.boundaryGap(false);
+        categoryAxis.setData(mAxisXValues);
+        option.xAxis(categoryAxis);
+
+        ValueAxis valueAxis = new ValueAxis();
+        option.yAxis(valueAxis);
+
+        DataZoom dataZoom = new DataZoom();
+        dataZoom.setType(DataZoomType.slider);
+        dataZoom.setStart(0);
+        dataZoom.setEnd(100);
+        option.dataZoom(dataZoom);
+
+        List<Double> p1 = new ArrayList<>();
+        List<Double> p2 = new ArrayList<>();
+        for (int i = 0; i < dataInfoList.size(); i++) {
+            p1.add(Double.valueOf(dataInfoList.get(i).getD1()));
+            p2.add(Double.valueOf(dataInfoList.get(i).getD2()));
+        }
+
+        List<Series> lines = new ArrayList<>();
+
+        Line line1 = new Line();
+        Line line2 = new Line();
+        line1.setData(p1);
+        line2.setData(p2);
+        line1.smooth(false).name("数值").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        line2.smooth(false).name("温度").itemStyle().normal().lineStyle().shadowColor("rgba(0,0,0,0)");
+        lines.add(line1);
+        lines.add(line2);
+        option.setSeries(lines);
+        return option;
+    }
+
     /**
      * 注入到JS里的对象接口
      */
-    class WebAppInterface {
+    /*class WebAppInterface {
         Context mContext;
 
         public WebAppInterface(Context c) {
             mContext = c;
         }
 
-        /**
+        *//**
          * 获取
          *
          * @return
-         */
+         *//*
         @JavascriptInterface
         public String getLineChartOptions() {
             GsonOption option = markLineChartOptions();
@@ -398,6 +420,6 @@ public class EChartsActivity extends BaseActivity {
             return option;
         }
 
-    }
+    }*/
 
 }

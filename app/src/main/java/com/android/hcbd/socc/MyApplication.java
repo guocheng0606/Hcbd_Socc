@@ -18,9 +18,11 @@ import com.lzy.okgo.cookie.store.DBCookieStore;
 import com.lzy.okgo.https.HttpsUtils;
 import com.lzy.okgo.interceptor.HttpLoggingInterceptor;
 import com.pgyersdk.crash.PgyCrashManager;
+import com.videogo.openapi.EZOpenSDK;
 
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 import okhttp3.OkHttpClient;
 
@@ -45,6 +47,14 @@ public class MyApplication extends Application {
         PgyCrashManager.register(this);
 
         initOkGo();
+
+        /** * sdk日志开关，正式发布需要去掉 */
+        EZOpenSDK.showSDKLog(true);
+        /** * 设置是否支持P2P取流,详见api */
+        EZOpenSDK.enableP2P(false);
+        /** * APP_KEY请替换成自己申请的 */
+        //EZOpenSDK.initLib(this, "25857dfcdcd64156bf7407ce791d4b45");
+
         /*CrashHandler crashHandler = CrashHandler.getInstance();
         crashHandler.init(getApplicationContext());*/
         Cockroach.install(new Cockroach.ExceptionHandler() {
@@ -109,12 +119,16 @@ public class MyApplication extends Application {
     }
 
     public String getIpInfo(){
-        return SharedPreferencesUtil.getByDefault(this, "ip_info","112.124.108.24:8688");
+        return SharedPreferencesUtil.getByDefault(this, "ip_info","47.98.134.90:18113");
     }
 
     public String getBsaeUrl(){
         return "http://"+ getIpInfo()+"/socc";
     }
 
+    public boolean isInteger(String str) {
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
+    }
 
 }

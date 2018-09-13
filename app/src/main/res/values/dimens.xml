@@ -2,4 +2,23 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="realplay_button_text_size">15dp</dimen>
+    <dimen name="realplay_text_size">12dp</dimen>
+    <dimen name="realplay_ratio_text_size">24dp</dimen>
+    <dimen name="realplay_channel_text_size">9dp</dimen>
+    <dimen name="source_detection_text_size">23dp</dimen>
+    <dimen name="loading_text_size">15dp</dimen>
+    <dimen name="title_text_size">18dp</dimen>
+
+    <!-- 回放列表 -->
+    <dimen name="remotelist_time_text_size">9dp</dimen>
+    <dimen name="remotelist_item_local_time_size">12dp</dimen>
+    <dimen name="remotelist_item_more_text_size">15dp</dimen>
+    <dimen name="remotelist_num_tip_size">12dp</dimen>
+
+    <dimen name="remoteplayback_text_size">12dp</dimen>
+    <dimen name="remoteplayback_ratio_text_size">24dp</dimen>
+
+
 </resources>

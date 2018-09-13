@@ -158,8 +158,9 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:src="@drawable/image_home_chart"
-                                android:layout_centerHorizontal="true"
-                                android:layout_above="@+id/tv_chart"/>
+                                android:layout_above="@+id/tv_chart"
+                                android:layout_alignParentLeft="true"
+                                android:layout_alignParentStart="true" />
                             <TextView
                                 android:id="@+id/tv_chart"
                                 android:layout_width="wrap_content"
@@ -202,9 +203,33 @@
                         </RelativeLayout>
                     </RelativeLayout>
                     <RelativeLayout
+                        android:id="@+id/rl_video"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1">
+                        android:layout_weight="1"
+                        android:background="?android:attr/selectableItemBackground">
+                        <RelativeLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:layout_marginBottom="35px">
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/image_home_video"
+                                android:layout_centerHorizontal="true"
+                                android:layout_above="@+id/tv_video"/>
+                            <TextView
+                                android:id="@+id/tv_video"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/video"
+                                android:textColor="@color/black"
+                                android:textSize="28px"
+                                android:layout_marginTop="25px"
+                                android:layout_alignParentBottom="true"
+                                android:layout_centerHorizontal="true"/>
+                        </RelativeLayout>
                     </RelativeLayout>
                 </LinearLayout>
 

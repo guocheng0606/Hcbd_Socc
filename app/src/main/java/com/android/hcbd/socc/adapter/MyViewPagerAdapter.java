@@ -20,6 +20,10 @@ public class MyViewPagerAdapter extends FragmentPagerAdapter {
         mFragments.add(fragment);
         fragmentTitles.add(title);
     }
+    public void clearFragment(){
+        mFragments.clear();
+        fragmentTitles.clear();
+    }
     @Override
     public Fragment getItem(int position) {
         return mFragments.get(position);

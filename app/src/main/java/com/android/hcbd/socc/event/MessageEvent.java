@@ -24,6 +24,8 @@ public class MessageEvent {
     public static final int EVENT_IPADDRESS_DEL = 120;
     public static final int EVENT_LOGINOUT = 121;
 
+    public static final int EVENT_ROUTE_CHANGE_RESULT = 200;
+
 
     private int eventId;
     private Object obj;

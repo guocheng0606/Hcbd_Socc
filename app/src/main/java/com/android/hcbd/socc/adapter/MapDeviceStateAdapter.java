@@ -27,6 +27,11 @@ public class MapDeviceStateAdapter extends BaseAdapter {
         this.context = context;
         this.list = list;
     }
+
+    public List<DeviceStateListInfo.DataInfo> getAllData(){
+        return list;
+    }
+
     @Override
     public int getCount() {
         return list == null ? 0 : list.size();

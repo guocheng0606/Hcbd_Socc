@@ -1,8 +1,10 @@
 package com.android.hcbd.socc.ui.activity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +26,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ZoomControls;
 
@@ -35,8 +40,10 @@ import com.android.hcbd.socc.entity.LocationInfo;
 import com.android.hcbd.socc.event.MessageEvent;
 import com.android.hcbd.socc.listener.MyLocationListener;
 import com.android.hcbd.socc.listener.MyOrientationListener;
+import com.android.hcbd.socc.util.CoordUtils;
 import com.android.hcbd.socc.util.HttpUrlUtils;
 import com.android.hcbd.socc.util.LogUtils;
+import com.android.hcbd.socc.util.OpenLocalMapUtil;
 import com.android.hcbd.socc.util.ProgressDialogUtils;
 import com.android.hcbd.socc.util.ToastUtils;
 import com.baidu.location.BDLocationListener;
@@ -57,7 +64,17 @@ import com.baidu.mapapi.map.MyLocationConfiguration;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.map.OverlayOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.blankj.utilcode.utils.KeyboardUtils;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.Target;
+import com.cocosw.bottomsheet.BottomSheet;
 import com.google.gson.Gson;
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
@@ -75,9 +92,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 
 public class MapActivity extends BaseActivity implements View.OnClickListener{
@@ -106,6 +129,8 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
     ImageButton ibMode;
     @BindView(R.id.ib_loc)
     ImageButton ibLoc;
+    @BindView(R.id.rl_map)
+    RelativeLayout rlMap;
 
 
     private BaiduMap mBaiduMap;
@@ -113,7 +138,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
 
     public LocationClient mLocationClient;
     public BDLocationListener mBDLocationListener = new MyLocationListener();
-    private boolean isFirstLocation = true;
+    private boolean isFirstLocation;
 
     //模式切换，正常模式
     private boolean modeFlag = true;
@@ -161,7 +186,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
         //普通地图
         mBaiduMap.setMapType(BaiduMap.MAP_TYPE_NORMAL);
         mBaiduMap.setIndoorEnable(true);
-        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(17));
+        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(15));
 
         mLocationClient = new LocationClient(this);     //声明LocationClient类
         mLocationClient.registerLocationListener(mBDLocationListener);
@@ -186,7 +211,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                 if (isFirstLocation) {
                     isFirstLocation = false;
                     if(mBaiduMap.getMapStatus().zoom < 12){
-                        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(17));
+                        mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(15));
                         ibLarge.setEnabled(true);
                         ibLarge.setImageResource(R.drawable.icon_zoomin);
                         ibSmall.setEnabled(true);
@@ -238,18 +263,73 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                     mBaiduMap.clear();
                     List<DeviceStateListInfo.DataInfo> dataInfoList = deviceStateListInfo.getDataInfoList();
                     for (int i = 0; i < dataInfoList.size(); i++) {
-                        //定义Maker坐标点
-                        LatLng point = new LatLng(dataInfoList.get(i).getY(), dataInfoList.get(i).getX());
-                        //构建Marker图标
-                        BitmapDescriptor bitmap = BitmapDescriptorFactory
-                                .fromResource(R.drawable.icon_marka);
-                        OverlayOptions option = new MarkerOptions()
-                                .position(point)
-                                .icon(bitmap)
-                                .title(dataInfoList.get(i).getName());
-                        //在地图上添加Marker，并显示
-                        mBaiduMap.addOverlay(option);
+                        final LatLng point = new LatLng(dataInfoList.get(i).getY(), dataInfoList.get(i).getX());
+                        final String imgUrl = MyApplication.getInstance().getBsaeUrl() + dataInfoList.get(i).getImg().replaceAll("\\\\","/" );
+                        final String title = dataInfoList.get(i).getName();
+                        //使用RxAndroid异步处理耗时操作
+                        Observable.create(new Observable.OnSubscribe<Bitmap>() {
+                            @Override
+                            public void call(Subscriber<? super Bitmap> subscriber) { //创建Observable，用来发送数据
+                                Bitmap bitmap = null;
+                                try {
+                                    bitmap = Glide.with(MapActivity.this)
+                                            .load(imgUrl)
+                                            .asBitmap()
+                                            .override(70, 70)
+                                            .fitCenter()
+                                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                            .into(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
+                                            .get();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                } catch (ExecutionException e) {
+                                    e.printStackTrace();
+                                }
+                                subscriber.onNext(bitmap);
+                                subscriber.onCompleted();
+                            }
+                        }).subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())  //使用ui线程来接收Observable发送的数据
+                                .subscribe(new Observer<Bitmap>() {  //创建了Subscriber(订阅者)，用来接收事件处理
+                                    @Override
+                                    public void onCompleted() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+
+                                    }
+
+                                    @Override
+                                    public void onNext(Bitmap bitmap) {
+                                        //构建Marker图标
+                                        BitmapDescriptor bt = null;
+                                        if (bitmap == null) {
+                                            bt = BitmapDescriptorFactory.fromResource(R.drawable.icon_marka);
+                                        } else {
+                                            bt = BitmapDescriptorFactory.fromBitmap(bitmap);
+                                        }
+                                        OverlayOptions option = new MarkerOptions()
+                                                .position(point)
+                                                .icon(bt)
+                                                .title(title);
+                                        //在地图上添加Marker，并显示
+                                        mBaiduMap.addOverlay(option);
+                                    }
+                                });
                     }
+
+                    mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(15));
+                    ibLarge.setEnabled(true);
+                    ibLarge.setImageResource(R.drawable.icon_zoomin);
+                    ibSmall.setEnabled(true);
+                    ibSmall.setImageResource(R.drawable.icon_zoomout);
+                    String[] points = deviceStateListInfo.getPoints().split(",");
+                    LatLng ll = new LatLng(Double.parseDouble(points[1]), Double.parseDouble(points[0]));
+                    MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
+                    mBaiduMap.animateMapStatus(update);
+
                     connectList.clear();
                     dangerList.clear();
                     disconnectList.clear();
@@ -313,6 +393,8 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                     deviceStateListInfo.setDanger(jsonObject.getString("danger"));
                     deviceStateListInfo.setConnect(jsonObject.getString("connect"));
                     deviceStateListInfo.setDisconnect(jsonObject.getString("disconnect"));
+                    deviceStateListInfo.setPoints(jsonObject.getString("points"));
+                    deviceStateListInfo.setTypeId(jsonObject.getString("typeId"));
 
                     Gson gson = new Gson();
                     JSONArray array = new JSONArray(jsonObject.getString("data"));
@@ -351,13 +433,13 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                 for (int i = 0; i < deviceStateListInfo.getDataInfoList().size(); i++) {
                     LatLng point = new LatLng(deviceStateListInfo.getDataInfoList().get(i).getY(), deviceStateListInfo.getDataInfoList().get(i).getX());
                     if (point.toString().equals(marker.getPosition().toString())) {
-                        Button button = new Button(getApplicationContext());
-                        button.setText(deviceStateListInfo.getDataInfoList().get(i).getName());
+                        View view = LayoutInflater.from(MapActivity.this).inflate(R.layout.map_window_layout,null);
+                        TextView tv = (TextView) view.findViewById(R.id.tv);
+                        tv.setText(deviceStateListInfo.getDataInfoList().get(i).getName());
                         LatLng pt = new LatLng(deviceStateListInfo.getDataInfoList().get(i).getY(), deviceStateListInfo.getDataInfoList().get(i).getX());
-                        InfoWindow mInfoWindow = new InfoWindow(button, pt, -55);
-
+                        InfoWindow mInfoWindow = new InfoWindow(view, pt, -60);
                         mBaiduMap.showInfoWindow(mInfoWindow);
-
+                        showMarkerPopupWinder(deviceStateListInfo.getDataInfoList().get(i), pt);
                     }
                 }
                 return false;
@@ -492,7 +574,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
             case R.id.tv_device_state_list:
                 Intent intent = new Intent(this, DeviceStateListActivity.class);
                 intent.putExtra("data", deviceStateListInfo);
-                startActivity(intent);
+                startActivityForResult(intent,0x10);
                 dismissPopupWindows();
                 break;
             case R.id.tv_auto_refresh:
@@ -565,16 +647,21 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
 
     }
 
+    PopupWindow devicePopup;
     private void showDevicePopupWindow(final int i) {
+        if(devicePopup != null){
+            devicePopup.dismiss();
+            devicePopup = null;
+        }
         View popupView = getLayoutInflater().inflate(R.layout.popup_map_device_state_layout, null);
-        PopupWindow window = new PopupWindow(popupView,
+        devicePopup = new PopupWindow(popupView,
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
-        window.setFocusable(true);
-        window.setOutsideTouchable(true);
-        window.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
+        devicePopup.setFocusable(true);
+        devicePopup.setOutsideTouchable(true);
+        devicePopup.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
         // 设置popWindow的显示和消失动画
-        window.setAnimationStyle(R.style.mypopwindow_anim_style);
+        //devicePopup.setAnimationStyle(R.style.mypopwindow_anim_style);
 
         TextView title = (TextView) popupView.findViewById(R.id.tv_title);
         ListView listView = (ListView) popupView.findViewById(R.id.listView);
@@ -602,22 +689,29 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                 title.setText("无断开状态设备");
             }
         }
+        final MapDeviceStateAdapter finalAdapter = adapter;
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 LatLng ll = null;
-                if (i == 1) {
+                /*if (i == 1) {
                     ll = new LatLng(connectList.get(position).getY(), connectList.get(position).getX());
-                } else if (i == 3) {
+                } else {
                     ll = new LatLng(disconnectList.get(position).getY(), disconnectList.get(position).getX());
-                }
-                LogUtils.LogShow(ll.toString());
+                }*/
+                ll = new LatLng(finalAdapter.getAllData().get(position).getY(), finalAdapter.getAllData().get(position).getX());
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
                 mBaiduMap.animateMapStatus(update);
+
+                View wView = LayoutInflater.from(MapActivity.this).inflate(R.layout.map_window_layout,null);
+                TextView tv = (TextView) wView.findViewById(R.id.tv);
+                tv.setText(finalAdapter.getAllData().get(position).getName());
+                InfoWindow mInfoWindow = new InfoWindow(wView, ll, -60);
+                mBaiduMap.showInfoWindow(mInfoWindow);
             }
         });
         // 在底部显示
-        window.showAtLocation(activityMap, Gravity.BOTTOM, 0, 0);
+        devicePopup.showAtLocation(activityMap, Gravity.BOTTOM, 0, 0);
     }
 
     private void showAutoRehreshDialog() {
@@ -693,7 +787,6 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
     }
 
     private PopupWindow mPopupWindow;
-
     private void showMorePop() {
         if (mPopupWindow == null) {
             View popupView = getLayoutInflater().inflate(R.layout.popup_map_more_layout, null);
@@ -778,6 +871,179 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                 mBaiduMap.setMyLocationData(locData);
             }
         });
+    }
+
+
+    PopupWindow markerPopup;
+    private void showMarkerPopupWinder(final DeviceStateListInfo.DataInfo data, final LatLng latLng) {
+        if(markerPopup != null){
+            markerPopup.dismiss();
+            markerPopup = null;
+        }
+        View popupView = LayoutInflater.from(MapActivity.this).inflate(R.layout.popup_map_marker_info_layout, null);
+        markerPopup = new PopupWindow(popupView,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT);
+        markerPopup.setFocusable(true);
+        markerPopup.setOutsideTouchable(true);
+        markerPopup.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
+
+        final LinearLayout ll_layout = (LinearLayout) popupView.findViewById(R.id.ll_layout);
+        TextView tvName = (TextView) popupView.findViewById(R.id.tv_name);
+        TextView tvSn = (TextView) popupView.findViewById(R.id.tv_sn);
+        final TextView tvAddress = (TextView) popupView.findViewById(R.id.tv_address);
+        TextView tvPoint = (TextView) popupView.findViewById(R.id.tv_point);
+        ImageView ivFollow = (ImageView) popupView.findViewById(R.id.iv_follow);
+        final ProgressBar progress = (ProgressBar) popupView.findViewById(R.id.progress);
+        tvName.setText("设备名称：" + data.getName());
+        tvSn.setText("设备类型：" + data.getType()+"  状态："+data.getState());
+        tvPoint.setText("坐标：" + data.getX()+","+data.getY());
+
+        final GeoCoder mSearch = GeoCoder.newInstance();
+        final String[] addr = new String[1];
+        mSearch.setOnGetGeoCodeResultListener(new OnGetGeoCoderResultListener() {
+            @Override
+            public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+                if (geoCodeResult == null || geoCodeResult.error != SearchResult.ERRORNO.NO_ERROR) {
+                    //没有检索到结果
+                }
+                //获取地理编码结果
+            }
+
+            @Override
+            public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+                if (reverseGeoCodeResult == null || reverseGeoCodeResult.error != SearchResult.ERRORNO.NO_ERROR) {
+                    //没有找到检索结果
+                    tvAddress.setText("");
+                    return;
+                }
+                //获取反向地理编码结果
+                addr[0] = reverseGeoCodeResult.getAddress() + reverseGeoCodeResult.getSematicDescription();
+                tvAddress.setText("地址：" + reverseGeoCodeResult.getAddress() + reverseGeoCodeResult.getSematicDescription());
+                progress.setVisibility(View.GONE);
+                ll_layout.setVisibility(View.VISIBLE);
+            }
+        });
+        mSearch.reverseGeoCode(new ReverseGeoCodeOption().location(latLng));
+
+        ivFollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(MapActivity.this).setTitle("请选择")
+                        .setItems(new String[]{"查看线路", "本机地图"}, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                switch (i) {
+                                    case 0:
+                                        Intent intent = new Intent(MapActivity.this, LineSelectActivity.class);
+                                        intent.putExtra("st",new LatLng(mCurrentlocation.getLatitude(), mCurrentlocation.getLongitude()));
+                                        intent.putExtra("en", latLng);
+                                        intent.putExtra("addr", addr[0]);
+                                        startActivity(intent);
+                                        if(markerPopup != null)
+                                            markerPopup.dismiss();
+                                        break;
+                                    case 1:
+                                        if(OpenLocalMapUtil.isBaiduMapInstalled() && OpenLocalMapUtil.isGdMapInstalled()){
+                                            chooseOpenMap(latLng,data.getName());
+                                            return;
+                                        }
+                                        if(OpenLocalMapUtil.isBaiduMapInstalled()){
+                                            openBaiduMap(latLng,data.getName());
+                                            return;
+                                        }
+                                        if(OpenLocalMapUtil.isGdMapInstalled()){
+                                            openGaoDeMap(latLng,data.getName());
+                                            return;
+                                        }
+                                        openWebMap(latLng,data.getName());
+                                        break;
+                                }
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        }).show();
+
+            }
+        });
+
+        // 在底部显示
+        markerPopup.showAtLocation(activityMap, Gravity.BOTTOM, 0, 0);
+        markerPopup.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                mSearch.destroy();
+            }
+        });
+    }
+
+    private void chooseOpenMap(final LatLng latLng , final String name){
+        BottomSheet.Builder builder = new BottomSheet
+                .Builder(MapActivity.this, com.cocosw.bottomsheet.R.style.BottomSheet_Dialog)
+                .title("请选择");
+        builder.sheet(0, "百度地图").sheet(1, "高德地图")
+                .listener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            openBaiduMap(latLng,name);
+                        } else if(which == 1){
+                            openGaoDeMap(latLng,name);
+                        }
+                    }
+                }).build().show();
+    }
+
+    private void openBaiduMap(LatLng latLng , String name){
+        Intent intent = new Intent();
+        // 反向地址解析
+        intent.setData(Uri.parse("baidumap://map/marker?location="+latLng.latitude+","+latLng.longitude+"&title="+name+"&src=andr.baidu.openAPIdemo"));
+        startActivity(intent);
+    }
+
+    private void openGaoDeMap(LatLng latLng ,String name){
+        //double[] points = OpenLocalMapUtil.bdToGaoDe(latLng.latitude,latLng.longitude);
+
+        LatLng desLatLng = CoordUtils.convertBaiduToGPS(latLng);
+
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.VIEW");
+        intent.setPackage("com.autonavi.minimap");
+        intent.addCategory("android.intent.category.DEFAULT");
+        intent.setData(Uri.parse("androidamap://viewMap?sourceApplication=socc&lat="+desLatLng.latitude+"&lon="+desLatLng.longitude+"&poiname="+name+"&dev=1"));
+        startActivity(intent);
+    }
+
+    private void openWebMap(LatLng latLng ,String name){
+        Uri mapUri = Uri.parse("http://api.map.baidu.com/marker?location=" + latLng.latitude + "," + latLng.longitude +
+                "&title=" + name + "&output=html");
+        Intent loction = new Intent(Intent.ACTION_VIEW, mapUri);
+        startActivity(loction);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == 0x10) {
+            if (resultCode == 0x11) {
+                DeviceStateListInfo.DataInfo data = (DeviceStateListInfo.DataInfo) intent.getSerializableExtra("device_info");
+                LatLng ll = new LatLng(data.getY(), data.getX());;
+                MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
+                mBaiduMap.animateMapStatus(update);
+
+                View wView = LayoutInflater.from(MapActivity.this).inflate(R.layout.map_window_layout,null);
+                TextView tv = (TextView) wView.findViewById(R.id.tv);
+                tv.setText(data.getName());
+                InfoWindow mInfoWindow = new InfoWindow(wView, ll, -60);
+                mBaiduMap.showInfoWindow(mInfoWindow);
+            }
+        }
     }
 
     private void initLocation() {

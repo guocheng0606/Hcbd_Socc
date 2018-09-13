@@ -68,7 +68,7 @@ public class LoginActivity extends AutoLayoutActivity implements View.OnClickLis
         et_username.setSelection(user.length());
         btn_login.setOnClickListener(this);
         requestMultiPermission();
-        checkUpdate() ;
+        checkUpdate();
     }
 
     private void checkUpdate() {

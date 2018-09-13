@@ -43,6 +43,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     RelativeLayout rl_product_center;
     @BindView(R.id.rl_contact_us)
     RelativeLayout rl_contact_us;
+    @BindView(R.id.rl_video)
+    RelativeLayout rl_video;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,40 +66,58 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         rl_about_us.setOnClickListener(this);
         rl_product_center.setOnClickListener(this);
         rl_contact_us.setOnClickListener(this);
+        rl_video.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
+        Intent intent = new Intent();
         switch (view.getId()){
             case R.id.rl_map:
-                startActivity(new Intent(this,MapActivity.class));
+                intent.setClass(this,MapActivity.class);
+                startActivity(intent);
                 break;
             case R.id.rl_device_manager:
-                startActivity(new Intent(this,DeviceManagerActivity.class));
+                intent.setClass(this,DeviceManagerActivity.class);
+                startActivity(intent);
                 break;
             case R.id.rl_data:
-                startActivity(new Intent(this,DeviceDataActivity.class));
+                intent.setClass(this,DataSearchActivity.class);
+                intent.putExtra("type","data");
+                startActivity(intent);
                 break;
             case R.id.rl_chart:
-                startActivity(new Intent(this,EChartsActivity.class));
+                intent.setClass(this,DataSearchActivity.class);
+                intent.putExtra("type","charts");
+                startActivity(intent);
                 break;
             case R.id.rl_early_warning:
-                startActivity(new Intent(this,WarnListActivity.class));
+                intent.setClass(this,WarnListActivity.class);
+                startActivity(intent);
                 break;
             case R.id.rl_resolver_manager:
-                startActivity(new Intent(this,SoluSoftManagerActivity.class));
+                intent.setClass(this,SoluSoftManagerActivity.class);
+                startActivity(intent);
                 break;
             case R.id.rl_setting:
-                startActivity(new Intent(this,SettingActivity.class));
+                intent.setClass(this,SettingActivity.class);
+                startActivity(intent);
                 break;
             case R.id.rl_about_us:
-                startActivity(new Intent(this,AboutUsActivity.class));
+                intent.setClass(this,AboutUsActivity.class);
+                startActivity(intent);
                 break;
             case R.id.rl_product_center:
-                startActivity(new Intent(this,ProductCenterActivity.class));
+                intent.setClass(this,ProductCenterActivity.class);
+                startActivity(intent);
                 break;
             case R.id.rl_contact_us:
-                startActivity(new Intent(this,ContactUsActivity.class));
+                intent.setClass(this,ContactUsActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.rl_video:
+                intent.setClass(this,CameraListActivity.class);
+                startActivity(intent);
                 break;
         }
     }

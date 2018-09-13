@@ -9,36 +9,38 @@ import java.util.List;
 
 public class DeviceInfo implements Serializable {
 
-
     /**
-     * code : A00006
-     * createTime : 2018-08-08T20:55:36
-     * id : 71
-     * isRef : 1
+     * bdPosition : 115.13035738259,30.200276967478
+     * code : A00014
+     * createTime : 2018-08-09T10:39:46
+     * id : 59
+     * isRef : 0
      * modelContent : ["设备信息","/socc/deviceAction!"]
-     * name : TCJZ0001
-     * names : A00006-TCJZ0001
-     * operNames : S0006-admin
+     * name : R008(板岩山监测站1)
+     * names : A00014-R008(板岩山监测站1)
+     * operNames : S0000-Eingabe
      * orgCode : 027
      * paramsObj : null
-     * port : 7003
+     * port : 5771
+     * position : 8.90003_-360.464_198.403
      * project : {"addr":null,"code":"001","createTime":"2017-03-16T17:29:57","id":1,"modelContent":["工程项目","/socc/projectAction!"],"name":"华创工程部","names":"001-华创工程部","operNames":"S0000-Eingabe","orgCode":"027","owner":null,"paramsObj":null,"remark":"","state":"1","stateContent":"启用"}
      * remark :
-     * snNo : B0003
-     * soluTime : 3600
+     * snNo : R00008
+     * soluTime : 7200
      * state : 1
      * stateContent : 启用
      * type : {"code":"001","createTime":"2017-03-16T17:39:22","id":1,"modelContent":["分析代码数据","/nsp/typeAction!"],"name":"GNSS","names":"001-GNSS","operNames":"S0000-Eingabe","orgCode":"027","paramsObj":null,"remark":"\\upload\\deviceType\\001.png","state":"1","stateContent":"启用","type":"A001","upload":null,"uploadContentType":null,"uploadFileName":null}
-     * unit : null
-     * upCode :
+     * unit : mm
+     * upCode : A00006
      * upload : null
      * uploadContentType : null
      * uploadFileName : null
-     * x : 0.0
-     * y : 0.0
-     * z : 0.0
+     * x : 115.11832988656056
+     * y : 30.19686279774174
+     * z : 17214.326507511458
      */
 
+    private String bdPosition;
     private String code;
     private String createTime;
     private int id;
@@ -49,6 +51,7 @@ public class DeviceInfo implements Serializable {
     private String orgCode;
     private Object paramsObj;
     private int port;
+    private String position;
     private ProjectBean project;
     private String remark;
     private String snNo;
@@ -56,7 +59,7 @@ public class DeviceInfo implements Serializable {
     private String state;
     private String stateContent;
     private TypeBean type;
-    private Object unit;
+    private String unit;
     private String upCode;
     private Object upload;
     private Object uploadContentType;
@@ -65,6 +68,14 @@ public class DeviceInfo implements Serializable {
     private double y;
     private double z;
     private List<String> modelContent;
+
+    public String getBdPosition() {
+        return bdPosition;
+    }
+
+    public void setBdPosition(String bdPosition) {
+        this.bdPosition = bdPosition;
+    }
 
     public String getCode() {
         return code;
@@ -146,6 +157,14 @@ public class DeviceInfo implements Serializable {
         this.port = port;
     }
 
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
     public ProjectBean getProject() {
         return project;
     }
@@ -202,11 +221,11 @@ public class DeviceInfo implements Serializable {
         this.type = type;
     }
 
-    public Object getUnit() {
+    public String getUnit() {
         return unit;
     }
 
-    public void setUnit(Object unit) {
+    public void setUnit(String unit) {
         this.unit = unit;
     }
 
@@ -274,7 +293,7 @@ public class DeviceInfo implements Serializable {
         this.modelContent = modelContent;
     }
 
-    public static class ProjectBean implements Serializable {
+    public static class ProjectBean implements Serializable{
         /**
          * addr : null
          * code : 001
@@ -420,7 +439,25 @@ public class DeviceInfo implements Serializable {
         }
     }
 
-    public static class TypeBean implements Serializable {
+    public static class TypeBean implements Serializable{
+        /**
+         * code : 001
+         * createTime : 2017-03-16T17:39:22
+         * id : 1
+         * modelContent : ["分析代码数据","/nsp/typeAction!"]
+         * name : GNSS
+         * names : 001-GNSS
+         * operNames : S0000-Eingabe
+         * orgCode : 027
+         * paramsObj : null
+         * remark :
+         * state : 1
+         * stateContent : 启用
+         * type : A001
+         * upload : null
+         * uploadContentType : null
+         * uploadFileName : null
+         */
 
         private String code;
         private String createTime;

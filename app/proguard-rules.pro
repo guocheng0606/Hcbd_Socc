@@ -184,6 +184,9 @@
 #materialedittext
 -dontwarn com.rengwuxian.materialedittext.**
 -keep class com.rengwuxian.materialedittext.** { *; }
+#StateView
+-dontwarn com.lany.state.**
+-keep class com.lany.state.** { *; }
 #andpermission
 -keepclassmembers class ** {
     @com.yanzhenjie.permission.PermissionYes <methods>;
@@ -192,13 +195,19 @@
     @com.yanzhenjie.permission.PermissionNo <methods>;
 }
 
+
 ####################zxing#####################
 #-keep class com.google.zxing.** {*;}
 #-dontwarn com.google.zxing.**
 ##百度定位
 -keep class com.baidu.** {*;}
--keep class vi.com.** {*;}
+-keep class mapsdkvi.com.** {*;}
 -dontwarn com.baidu.**
+-keep class vi.com.** {*;}
+#-keep class com.baidu.** {*;}
+#-keep class vi.com.** {*;}
+#-dontwarn com.baidu.**
+
 #-ButterKnife 7.0
  -keep class butterknife.** { *; }
  -dontwarn butterknife.internal.**
@@ -268,3 +277,63 @@
 #-dontwarn org.apache.log4j.**
 #-keep class  org.apache.log4j.** { *;}
 
+
+#Rxjava RxAndroid
+-dontwarn rx.*
+-dontwarn sun.misc.**
+
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+   long producerIndex;
+   long consumerIndex;
+}
+
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode consumerNode;
+}
+
+#萤石摄像机sdk混淆
+-dontwarn com.ezviz.player.**
+-keep class com.ezviz.player.** { *;}
+
+-dontwarn com.ezviz.statistics.**
+-keep class com.ezviz.statistics.** { *;}
+
+-dontwarn com.ezviz.stream.**
+-keep class com.ezviz.stream.** { *;}
+
+-dontwarn com.ezviz.hcnetsdk.**
+-keep class com.ezviz.hcnetsdk.** { *;}
+
+
+-dontwarn com.ezviz.opensdk.**
+-keep class com.ezviz.opensdk.** { *;}
+
+-dontwarn com.hik.**
+-keep class com.hik.** { *;}
+
+-dontwarn com.hikvision.**
+-keep class com.hikvision.** { *;}
+
+-dontwarn com.videogo.**
+-keep class com.videogo.** { *;}
+
+-dontwarn org.MediaPlayer.PlayM4.**
+-keep class org.MediaPlayer.PlayM4.** { *;}
+
+-dontwarn com.sun.jna.**
+-keep class com.sun.jna.**{*;}
+
+#Gson混淆配置
+-keepattributes Annotation
+-keep class sun.misc.Unsafe { *; }
+-keep class com.idea.fifaalarmclock.entity.*
+-keep class com.google.gson.stream.* { *; }
+
+#引用mars的xlog，混淆配置
+-keep class com.tencent.mars.** {
+ public protected private *;
+}

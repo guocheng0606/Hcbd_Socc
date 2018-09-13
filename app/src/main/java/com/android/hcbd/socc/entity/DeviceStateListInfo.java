@@ -12,6 +12,8 @@ public class DeviceStateListInfo implements Serializable {
     private String danger; //危险个数
     private String connect; //连接个数
     private String disconnect;  //断开个数
+    private String points;
+    private String typeId;
     private List<DataInfo> dataInfoList;
 
     public String getIndexRate() {
@@ -52,6 +54,22 @@ public class DeviceStateListInfo implements Serializable {
 
     public void setDataInfoList(List<DataInfo> dataInfoList) {
         this.dataInfoList = dataInfoList;
+    }
+
+    public String getPoints() {
+        return points;
+    }
+
+    public void setPoints(String points) {
+        this.points = points;
+    }
+
+    public String getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(String typeId) {
+        this.typeId = typeId;
     }
 
     public static class DataInfo implements Serializable{

@@ -52,6 +52,9 @@ public class DeviceInfoActivity extends BaseActivity implements View.OnClickList
     TextView tvPort;
     @BindView(R.id.tv_unit)
     TextView tvUnit;
+    @BindView(R.id.tv_position)
+    TextView tvPosition;
+
 
     private DeviceInfo deviceInfo;
 
@@ -100,6 +103,7 @@ public class DeviceInfoActivity extends BaseActivity implements View.OnClickList
         tvPort.setText(formatText(String.valueOf(deviceInfo.getPort())));
         tvUnit.setText(formatText(String.valueOf(deviceInfo.getUnit())));
         tvRemark.setText(formatText(deviceInfo.getRemark()));
+        tvPosition.setText(formatText(deviceInfo.getPosition()));
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.android.hcbd.socc.ui.activity;
 
-import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,17 +8,18 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.android.hcbd.socc.MyApplication;
 import com.android.hcbd.socc.R;
 import com.android.hcbd.socc.entity.DataInfo;
 import com.android.hcbd.socc.entity.DataSearchInfo;
 import com.android.hcbd.socc.entity.DeviceInfo;
-import com.android.hcbd.socc.event.MessageEvent;
 import com.android.hcbd.socc.util.HttpUrlUtils;
 import com.android.hcbd.socc.util.LogUtils;
 import com.android.hcbd.socc.util.ToastUtils;
-import com.android.hcbd.socc.viewholder.DataViewHolder;
+import com.android.hcbd.socc.viewholder.DataViewHolder1;
+import com.android.hcbd.socc.viewholder.DataViewHolder2;
 import com.google.gson.Gson;
 import com.jude.easyrecyclerview.EasyRecyclerView;
 import com.jude.easyrecyclerview.adapter.BaseViewHolder;
@@ -30,35 +31,32 @@ import com.lzy.okgo.model.HttpParams;
 import com.lzy.okgo.model.Response;
 import com.lzy.okgo.request.base.Request;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class DeviceDataActivity extends BaseActivity implements View.OnClickListener ,RecyclerArrayAdapter.OnLoadMoreListener, SwipeRefreshLayout.OnRefreshListener{
+public class DeviceDataActivity extends BaseActivity implements View.OnClickListener, RecyclerArrayAdapter.OnLoadMoreListener, SwipeRefreshLayout.OnRefreshListener {
 
 
     @BindView(R.id.iv_back)
     ImageView ivBack;
-    @BindView(R.id.iv_search)
-    ImageView ivSearch;
     @BindView(R.id.iv_export)
     ImageView ivExport;
     @BindView(R.id.swipeRefreshLayout)
     SwipeRefreshLayout swipeRefreshLayout;
     @BindView(R.id.recyclerView)
     EasyRecyclerView recyclerView;
+    @BindView(R.id.ll_top1)
+    LinearLayout llTop1;
+    @BindView(R.id.ll_top2)
+    LinearLayout llTop2;
+
 
     private int currentPage = 1;
     private DataSearchInfo dataSearchInfo;
@@ -71,35 +69,26 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device_data);
         ButterKnife.bind(this);
-        EventBus.getDefault().register(this);
 
+
+        dataSearchInfo = (DataSearchInfo) getIntent().getSerializableExtra("search_info");
+        if (dataSearchInfo.isGnss()) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            llTop1.setVisibility(View.VISIBLE);
+            llTop2.setVisibility(View.GONE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            llTop1.setVisibility(View.GONE);
+            llTop2.setVisibility(View.VISIBLE);
+        }
         initView();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date date = new Date(System.currentTimeMillis());
-        if (dataSearchInfo == null )
-            dataSearchInfo = new DataSearchInfo();
-        dataSearchInfo.setBeginTime(simpleDateFormat.format(date)+" 00:00");
-        dataSearchInfo.setEndTime(simpleDateFormat.format(date)+" 23:59");
         initHttpData();
         initListener();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onMessageEvent(MessageEvent event) {
-        switch (event.getEventId()) {
-            case MessageEvent.EVENT_DATA_SEARCH:
-                dataSearchInfo = (DataSearchInfo) event.getObj();
-                swipeRefreshLayout.setRefreshing(true);
-                onRefresh();
-                break;
-        }
-    }
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
     }
 
     private void initView() {
@@ -111,7 +100,10 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
         recyclerView.setAdapterWithProgress(adapter = new RecyclerArrayAdapter<DataInfo>(this) {
             @Override
             public BaseViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
-                return new DataViewHolder(parent);
+                if (dataSearchInfo.isGnss())
+                    return new DataViewHolder1(parent);
+                else
+                    return new DataViewHolder2(parent);
             }
         });
         adapter.setMore(R.layout.view_more, this);
@@ -147,7 +139,7 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
         }
         params.put("currentPage", currentPage);
 
-        OkGo.<String>post(MyApplication.getInstance().getBsaeUrl()+HttpUrlUtils.device_data_url)
+        OkGo.<String>post(MyApplication.getInstance().getBsaeUrl() + HttpUrlUtils.device_data_url)
                 .params(params)
                 .execute(new StringCallback() {
                     @Override
@@ -158,33 +150,32 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
                     @Override
                     public void onSuccess(Response<String> response) {
                         String result = response.body();
-                        LogUtils.LogShow(result);
                         JSONObject jsonObject = null;
                         try {
                             jsonObject = new JSONObject(result);
+                            LogUtils.LogShow(jsonObject.getString("data"));
                             Gson gson = new Gson();
-
                             deviceList.clear();
                             JSONArray a = new JSONArray(jsonObject.getString("deviceList"));
-                            for(int i=0;i<a.length();i++){
-                                DeviceInfo deviceInfo = gson.fromJson(a.getString(i),DeviceInfo.class);
+                            for (int i = 0; i < a.length(); i++) {
+                                DeviceInfo deviceInfo = gson.fromJson(a.getString(i), DeviceInfo.class);
                                 deviceList.add(deviceInfo);
                             }
 
                             JSONArray array = new JSONArray(jsonObject.getString("data"));
-                            if(array.length() > 0){
+                            if (array.length() > 0) {
                                 dataInfoList.clear();
-                                for(int i=0;i<array.length();i++){
-                                    DataInfo dataInfo = gson.fromJson(array.getString(i),DataInfo.class);
+                                for (int i = 0; i < array.length(); i++) {
+                                    DataInfo dataInfo = gson.fromJson(array.getString(i), DataInfo.class);
                                     dataInfoList.add(dataInfo);
                                 }
-                                if(currentPage == 1)
+                                if (currentPage == 1)
                                     adapter.clear();
                                 adapter.addAll(dataInfoList);
-                            }else{
-                                if(currentPage == 1){
+                            } else {
+                                if (currentPage == 1) {
                                     recyclerView.showEmpty();
-                                }else{
+                                } else {
                                     adapter.stopMore();
                                 }
                             }
@@ -197,9 +188,9 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
                     @Override
                     public void onError(Response<String> response) {
                         super.onError(response);
-                        if(currentPage == 1){
-                            ToastUtils.showShortToast(MyApplication.getInstance(),"请检查是否连接网络！");
-                        }else{
+                        if (currentPage == 1) {
+                            ToastUtils.showShortToast(MyApplication.getInstance(), "请检查是否连接网络！");
+                        } else {
                             adapter.pauseMore();
                         }
                     }
@@ -215,21 +206,14 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
 
     private void initListener() {
         ivBack.setOnClickListener(this);
-        ivSearch.setOnClickListener(this);
         ivExport.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.iv_back:
                 finishActivity();
-                break;
-            case R.id.iv_search:
-                Intent intent = new Intent(this,DataSearchActivity.class);
-                intent.putExtra("search_info",dataSearchInfo);
-                intent.putExtra("deviceList", (Serializable) deviceList);
-                startActivity(intent);
                 break;
         }
     }
@@ -243,7 +227,6 @@ public class DeviceDataActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onLoadMore() {
         currentPage++;
-        System.out.println("加载更多。。。"+currentPage);
         initHttpData();
     }
 }

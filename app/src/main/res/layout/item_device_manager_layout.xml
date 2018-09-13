@@ -29,16 +29,18 @@
         android:textColor="@color/black"
         android:textSize="26px"
         android:gravity="center"/>
+
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1">
+
         <ImageView
             android:id="@+id/iv_delete"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_delete"
-            android:layout_centerInParent="true"/>
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_delete" />
     </RelativeLayout>
 
 </LinearLayout>

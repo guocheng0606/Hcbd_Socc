@@ -1,7 +1,9 @@
 package com.android.hcbd.socc.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -34,6 +36,15 @@ public class DeviceStateListActivity extends BaseActivity implements View.OnClic
         listView.setAdapter(adapter);
 
         iv_back.setOnClickListener(this);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent();
+                intent.putExtra("device_info", adapter.getAllList().get(i));
+                setResult(0x11, intent);
+                finish();
+            }
+        });
     }
 
     @Override

@@ -532,6 +532,46 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@string/position"
+                        android:textSize="26px"
+                        android:textColor="@color/black"/>
+                    <!--<TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="*"
+                        android:textSize="26px"
+                        android:textColor="@color/red"/>-->
+                </LinearLayout>
+                <EditText
+                    android:id="@+id/et_position"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="30px"
+                    android:background="@drawable/image_input_bg"
+                    android:hint="@string/input_position"
+                    android:paddingLeft="30px"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/text_color"
+                    android:textSize="26px"
+                    android:inputType="text"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="65px"
+                android:layout_marginTop="20px"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="156px"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="30px"
+                    android:gravity="center_vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/unit"
                         android:textSize="26px"
                         android:textColor="@color/black"/>
