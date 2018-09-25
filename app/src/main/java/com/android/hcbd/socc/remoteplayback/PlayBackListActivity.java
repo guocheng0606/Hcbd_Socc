@@ -2118,6 +2118,7 @@ public class PlayBackListActivity extends RootActivity implements QueryPlayBackL
         downShake.reset();
         downShake.setFillAfter(true);
 
+        DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), "hcbd2016");
 //        mPlayer = mOpenSDK.createPlayer(this, mCameraId);
     }
 

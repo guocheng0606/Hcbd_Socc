@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,6 +36,10 @@ import com.android.hcbd.socc.MyApplication;
 import com.android.hcbd.socc.R;
 import com.android.hcbd.socc.adapter.DangerDeviceListAdapter;
 import com.android.hcbd.socc.adapter.MapDeviceStateAdapter;
+import com.android.hcbd.socc.camera.realplay.EZRealPlayActivity;
+import com.android.hcbd.socc.camera.util.EZUtils;
+import com.android.hcbd.socc.entity.DataSearchInfo;
+import com.android.hcbd.socc.entity.DeviceInfo;
 import com.android.hcbd.socc.entity.DeviceStateListInfo;
 import com.android.hcbd.socc.entity.LocationInfo;
 import com.android.hcbd.socc.event.MessageEvent;
@@ -80,6 +85,12 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okgo.callback.StringCallback;
 import com.lzy.okgo.model.Response;
 import com.lzy.okgo.request.base.Request;
+import com.videogo.constant.IntentConsts;
+import com.videogo.exception.BaseException;
+import com.videogo.openapi.EZOpenSDK;
+import com.videogo.openapi.bean.EZCameraInfo;
+import com.videogo.openapi.bean.EZDeviceInfo;
+import com.videogo.util.LogUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -88,7 +99,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -102,8 +115,12 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.android.hcbd.socc.ui.activity.CameraListActivity.REQUEST_CODE;
+
 
 public class MapActivity extends BaseActivity implements View.OnClickListener{
+
+    protected static final String TAG = "MapActivity";
 
     @BindView(R.id.bmapView)
     MapView mMapView;
@@ -275,7 +292,7 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                                     bitmap = Glide.with(MapActivity.this)
                                             .load(imgUrl)
                                             .asBitmap()
-                                            .override(70, 70)
+                                            .override(75, 75)
                                             .fitCenter()
                                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                                             .into(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL)
@@ -699,6 +716,15 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                 } else {
                     ll = new LatLng(disconnectList.get(position).getY(), disconnectList.get(position).getX());
                 }*/
+
+                if(mBaiduMap.getMapStatus().zoom < 18){
+                    mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
+                    ibLarge.setEnabled(true);
+                    ibLarge.setImageResource(R.drawable.icon_zoomin);
+                    ibSmall.setEnabled(true);
+                    ibSmall.setImageResource(R.drawable.icon_zoomout);
+                }
+
                 ll = new LatLng(finalAdapter.getAllData().get(position).getY(), finalAdapter.getAllData().get(position).getX());
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);
                 mBaiduMap.animateMapStatus(update);
@@ -892,11 +918,12 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
         TextView tvName = (TextView) popupView.findViewById(R.id.tv_name);
         TextView tvSn = (TextView) popupView.findViewById(R.id.tv_sn);
         final TextView tvAddress = (TextView) popupView.findViewById(R.id.tv_address);
+        final TextView tvMore = (TextView) popupView.findViewById(R.id.tv_more);
         TextView tvPoint = (TextView) popupView.findViewById(R.id.tv_point);
         ImageView ivFollow = (ImageView) popupView.findViewById(R.id.iv_follow);
         final ProgressBar progress = (ProgressBar) popupView.findViewById(R.id.progress);
         tvName.setText("设备名称：" + data.getName());
-        tvSn.setText("设备类型：" + data.getType()+"  状态："+data.getState());
+        tvSn.setText("设备类型：" + data.getType()+"    状态："+data.getState());
         tvPoint.setText("坐标：" + data.getX()+","+data.getY());
 
         final GeoCoder mSearch = GeoCoder.newInstance();
@@ -972,6 +999,40 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
             }
         });
 
+        tvMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (data.getType().equals("视频")){
+
+                    getALlCamera(data);
+
+                } else {
+                    DataSearchInfo dataSearchInfo = new DataSearchInfo();
+
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    Date date = new Date(System.currentTimeMillis());
+                    dataSearchInfo.setDeviceName(data.getName());
+                    if (data.getType().equals("GNSS")){
+                        dataSearchInfo.setBeginTime(simpleDateFormat.format(date)+" 00:00");
+                        dataSearchInfo.setEndTime(simpleDateFormat.format(date)+" 23:59");
+                        dataSearchInfo.setGnss(true);
+                    } else {
+                        dataSearchInfo.setBeginTime(simpleDateFormat.format(getDateBefore(date,3))+" 00:00");
+                        dataSearchInfo.setEndTime(simpleDateFormat.format(date)+" 23:59");
+                        dataSearchInfo.setGnss(false);
+                    }
+
+                    LogUtils.LogShow("beginTime = "+dataSearchInfo.getBeginTime());
+
+                    Intent intent = new Intent();
+                    intent.setClass(MapActivity.this,EChartsActivity.class);
+                    intent.putExtra("search_info",dataSearchInfo);
+                    startActivity(intent);
+                }
+
+            }
+        });
+
         // 在底部显示
         markerPopup.showAtLocation(activityMap, Gravity.BOTTOM, 0, 0);
         markerPopup.setOnDismissListener(new PopupWindow.OnDismissListener() {
@@ -980,6 +1041,142 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
                 mSearch.destroy();
             }
         });
+    }
+
+    private void getALlCamera(final DeviceStateListInfo.DataInfo data){
+        OkGo.<String>post(MyApplication.getInstance().getBsaeUrl() + "/soccApp/appVideoAction!list.action")
+                .params("sessionOper.code", MyApplication.getInstance().getLoginInfo().getUserInfo().getCode())
+                .params("sessionOper.orgCode", MyApplication.getInstance().getLoginInfo().getUserInfo().getOrgCode())
+                .params("token", MyApplication.getInstance().getLoginInfo().getToken())
+                .execute(new StringCallback() {
+
+                    @Override
+                    public void onStart(Request<String, ? extends Request> request) {
+                        super.onStart(request);
+                        ProgressDialogUtils.showLoading(MapActivity.this);
+                    }
+
+                    @Override
+                    public void onSuccess(Response<String> response) {
+                        String result = response.body();
+                        LogUtils.LogShow(result);
+                        JSONObject jsonObject = null;
+                        try {
+                            jsonObject = new JSONObject(result);
+                            Gson gson = new Gson();
+                            String videoKeyStr = jsonObject.getString("videoKey");
+                            List<DeviceInfo> deviceInfoList = new ArrayList<>();
+                            JSONArray array = new JSONArray(jsonObject.getString("data"));
+
+                            if (array.length() > 0) {
+
+                                for (int i = 0; i < array.length(); i++) {
+                                    DeviceInfo deviceInfo = gson.fromJson(array.getString(i), DeviceInfo.class);
+                                    deviceInfoList.add(deviceInfo);
+                                }
+                                DeviceInfo deviceInfo = null;
+                                for (DeviceInfo info : deviceInfoList){
+                                    if (data.getName().equals(info.getName())) {
+                                        deviceInfo = info;
+                                        break;
+                                    }
+                                }
+
+                                new GetCamersInfoTask(deviceInfo,videoKeyStr).execute();
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Response<String> response) {
+                        super.onError(response);
+                        ToastUtils.showShortToast(MyApplication.getInstance(), "请检查是否连接网络！");
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        super.onFinish();
+                    }
+
+                });
+    }
+
+    private class GetCamersInfoTask extends AsyncTask<Void, Void, EZDeviceInfo> {
+        private DeviceInfo deviceInfo;
+        private String videoKeyStr;
+        public GetCamersInfoTask(DeviceInfo deviceInfo,String videoKeyStr) {
+            this.deviceInfo = deviceInfo;
+            this.videoKeyStr = videoKeyStr;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected EZDeviceInfo doInBackground(Void... voids) {
+            String[] str = deviceInfo.getSnNo().split("_");
+            if (str.length != 2) {
+                return null;
+            }
+            int index = Integer.parseInt(str[1].substring(str[1].length() - 1, str[1].length()));
+            String appKey, appToken = "";
+            try {
+                JSONObject jsonObject = new JSONObject(videoKeyStr);
+                appKey = jsonObject.getString("appKey" + index);
+                appToken = jsonObject.getString("appToken" + index);
+
+                EZOpenSDK.initLib(MyApplication.getInstance(), appKey);
+                EZOpenSDK.getInstance().setAccessToken(appToken);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            List<EZDeviceInfo> result = null;
+            try {
+                result = EZOpenSDK.getInstance().getDeviceList(0, 50);
+            } catch (BaseException e) {
+                e.printStackTrace();
+                return null;
+            }
+            for (EZDeviceInfo info : result) {
+                if (info.getDeviceSerial().equals(str[0])) {
+                    return info;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(EZDeviceInfo ezDeviceInfo) {
+            super.onPostExecute(ezDeviceInfo);
+
+            ProgressDialogUtils.dismissLoading();
+            if (ezDeviceInfo.getCameraNum() <= 0 || ezDeviceInfo.getCameraInfoList() == null || ezDeviceInfo.getCameraInfoList().size() <= 0) {
+                LogUtil.d(TAG, "cameralist is null or cameralist size is 0");
+                return;
+            }
+            if (ezDeviceInfo.getCameraNum() == 1 && ezDeviceInfo.getCameraInfoList() != null && ezDeviceInfo.getCameraInfoList().size() == 1) {
+                LogUtil.d(TAG, "cameralist have one camera");
+                final EZCameraInfo cameraInfo = EZUtils.getCameraInfoFromDevice(ezDeviceInfo, 0);
+                if (cameraInfo == null) {
+                    return;
+                }
+
+                Intent intent = new Intent(MapActivity.this, EZRealPlayActivity.class);
+                intent.putExtra(IntentConsts.EXTRA_CAMERA_INFO, cameraInfo);
+                intent.putExtra(IntentConsts.EXTRA_DEVICE_INFO, ezDeviceInfo);
+                startActivityForResult(intent, REQUEST_CODE);
+                return;
+            }
+        }
+
+
     }
 
     private void chooseOpenMap(final LatLng latLng , final String name){
@@ -1032,6 +1229,13 @@ public class MapActivity extends BaseActivity implements View.OnClickListener{
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == 0x10) {
             if (resultCode == 0x11) {
+                if(mBaiduMap.getMapStatus().zoom < 18){
+                    mBaiduMap.setMapStatus(MapStatusUpdateFactory.zoomTo(18));
+                    ibLarge.setEnabled(true);
+                    ibLarge.setImageResource(R.drawable.icon_zoomin);
+                    ibSmall.setEnabled(true);
+                    ibSmall.setImageResource(R.drawable.icon_zoomout);
+                }
                 DeviceStateListInfo.DataInfo data = (DeviceStateListInfo.DataInfo) intent.getSerializableExtra("device_info");
                 LatLng ll = new LatLng(data.getY(), data.getX());;
                 MapStatusUpdate update = MapStatusUpdateFactory.newLatLng(ll);

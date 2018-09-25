@@ -48,6 +48,7 @@ public class IpAddressActivity extends BaseActivity implements View.OnClickListe
 
     private Gson gson;
     private RecyclerArrayAdapter<String> adapter;
+    private int type;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,8 @@ public class IpAddressActivity extends BaseActivity implements View.OnClickListe
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         EventBus.getDefault().register(this);
+
+        type = getIntent().getIntExtra("type",-1);
 
         gson = new Gson();
         String ipStr = MyApplication.getInstance().getIpInfo();
@@ -178,12 +181,16 @@ public class IpAddressActivity extends BaseActivity implements View.OnClickListe
                 }
                 SharedPreferencesUtil.save(IpAddressActivity.this, "ip_history", gson.toJson(list));
 
-
-                MessageEvent messageEvent = new MessageEvent();
-                messageEvent.setEventId(MessageEvent.EVENT_LOGINOUT);
-                EventBus.getDefault().post(messageEvent);
                 dialogInterface.dismiss();
-                finishActivity();
+                if (type > 0) {
+                    finishActivity();
+                } else {
+                    MessageEvent messageEvent = new MessageEvent();
+                    messageEvent.setEventId(MessageEvent.EVENT_LOGINOUT);
+                    EventBus.getDefault().post(messageEvent);
+                    finishActivity();
+                }
+
             }
         });
         builder.create().show();

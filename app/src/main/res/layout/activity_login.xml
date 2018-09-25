@@ -5,6 +5,17 @@
     android:background="@drawable/image_login_bg">
 
     <ImageView
+        android:id="@+id/iv_setting"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/icon_setting_btn"
+        android:layout_alignParentRight="true"
+        android:paddingTop="10dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="10dp"/>
+
+    <ImageView
         android:id="@+id/iv_logo"
         android:layout_width="121px"
         android:layout_height="135px"

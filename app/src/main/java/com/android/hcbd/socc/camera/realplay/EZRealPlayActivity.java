@@ -65,7 +65,6 @@ import com.android.hcbd.socc.camera.util.VerifyCodeInput;
 import com.android.hcbd.socc.camera.widget.WaitDialog;
 import com.android.hcbd.socc.camera.widget.loading.LoadingTextView;
 import com.android.hcbd.socc.ui.activity.CameraListActivity;
-import com.android.hcbd.socc.ui.activity.LoginActivity;
 import com.android.hcbd.socc.util.LogUtils;
 import com.videogo.constant.Config;
 import com.videogo.constant.Constant;
@@ -654,6 +653,7 @@ public class EZRealPlayActivity extends Activity implements OnClickListener, Sur
 
             getRealPlaySquareInfo();
         }
+        DataManager.getInstance().setDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial(), "hcbd2016");
         if (mDeviceInfo != null && mDeviceInfo.getIsEncrypt() == 1) {
             mVerifyCode = DataManager.getInstance().getDeviceSerialVerifyCode(mCameraInfo.getDeviceSerial());
         }

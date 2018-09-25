@@ -121,8 +121,6 @@ public class CameraListActivity extends BaseActivity implements View.OnClickList
                 JSONObject jsonObject = new JSONObject(videoKeyStr);
                 appKey = jsonObject.getString("appKey" + index);
                 appToken = jsonObject.getString("appToken" + index);
-                LogUtils.LogShow("appKey = " + appKey);
-                LogUtils.LogShow("appToken = " + appToken);
 
                 EZOpenSDK.initLib(MyApplication.getInstance(), appKey);
                 EZOpenSDK.getInstance().setAccessToken(appToken);
@@ -132,7 +130,7 @@ public class CameraListActivity extends BaseActivity implements View.OnClickList
 
             List<EZDeviceInfo> result = null;
             try {
-                result = EZOpenSDK.getInstance().getDeviceList(0, 20);
+                result = EZOpenSDK.getInstance().getDeviceList(0, 50);
             } catch (BaseException e) {
                 e.printStackTrace();
                 return null;

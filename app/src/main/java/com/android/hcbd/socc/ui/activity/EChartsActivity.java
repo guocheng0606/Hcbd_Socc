@@ -40,6 +40,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -121,6 +122,7 @@ public class EChartsActivity extends BaseActivity {
                                 DataInfo dataInfo = gson.fromJson(array.getString(i), DataInfo.class);
                                 dataInfoList.add(dataInfo);
                             }
+                            Collections.reverse(dataInfoList);
 
                             if (array.length() == 0 && dataSearchInfo == null)
                                 ProgressDialogUtils.dismissLoading();
